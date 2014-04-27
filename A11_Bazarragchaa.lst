@@ -1,0 +1,236 @@
+--------------
+-- Zorigt Bazarragchaa
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+/* Delimiter #
+show create function a_testbed.BookSize\G
+show create function a_testbed.InternalBlankCount\G
+show create function a_testbed.PrevMonth\G
+Delimiter ; */
+
+/* TASK 01 */
+select tstBlank, a_testbed.InternalBlankCount(tstBlank) as NumBlanks
+from (
+select 'foo bar' as tstBlank
+union all
+select ' foobarr ' 
+union all
+select ' ffoo bar'
+union all
+select ' ffoo barr '
+union all
+select 'fooo bar'
+union all
+select 'fooo  bbar'
+union all
+select ' ffoo barr '
+union all
+select ' ffooo  bbarr ' 
+union all
+select ' ffooo   bbbarr ' 
+union all
+select ' ffoooo    bbbarr ' 
+union all
+select '   foo bar foo  bar      bar    ') as tstData
+--------------
+
++----------------------------------+-----------+
+| tstBlank                         | NumBlanks |
++----------------------------------+-----------+
+| foo bar                          |         1 |
+|  foobarr                         |         0 |
+|  ffoo bar                        |         1 |
+|  ffoo barr                       |         1 |
+| fooo bar                         |         1 |
+| fooo  bbar                       |         2 |
+|  ffoo barr                       |         1 |
+|  ffooo  bbarr                    |         2 |
+|  ffooo   bbbarr                  |         3 |
+|  ffoooo    bbbarr                |         4 |
+|    foo bar foo  bar      bar     |        10 |
++----------------------------------+-----------+
+11 rows in set (0.00 sec)
+
+--------------
+/* TASK 02 */
+
+select tstPage, a_testbed.BookSize(tstPage) as Sizes
+from (
+	select 100 as tstPage
+	union all
+	select 200
+	union all
+	select 201
+	union all 
+	select 500
+	union all 
+	select 501
+	union all 
+	select 502
+	union all 
+	select 1000
+	union all 
+	select 1001
+	union all 
+	select 1002
+	union all 
+	select 1500
+	union all 
+	select 1501
+	union all
+	select 1502
+	union all
+	select 0
+	union all
+	select -1
+	union all 
+	select -20
+	union all
+	select null) as tstBook
+--------------
+
++---------+---------------+
+| tstPage | Sizes         |
++---------+---------------+
+|     100 | Mini          |
+|     200 | Mini          |
+|     201 | Small         |
+|     500 | Small         |
+|     501 | Medium        |
+|     502 | Medium        |
+|    1000 | Medium        |
+|    1001 | Large         |
+|    1002 | Large         |
+|    1500 | Large         |
+|    1501 | Too Long      |
+|    1502 | Too Long      |
+|       0 | Mini          |
+|      -1 | Invalid Input |
+|     -20 | Invalid Input |
+|    NULL | Invalid Input |
++---------+---------------+
+16 rows in set (0.00 sec)
+
+--------------
+/* TASK 03 */
+select
+	a_testbed.BookSize(B.page_count) as 'BookSize'
+,	count(B.book_id) as 'NumBooks'
+from a_bkinfo.books B
+group by a_testbed.BookSize(B.page_count)
+order by field(a_testbed.BookSize(B.page_count), 'Mini', 'Small', 'Medium', 'Large', 'Too Long', 'Invalid Input')
+--------------
+
++---------------+----------+
+| BookSize      | NumBooks |
++---------------+----------+
+| Mini          |       14 |
+| Small         |       38 |
+| Medium        |       30 |
+| Large         |        2 |
+| Too Long      |        2 |
+| Invalid Input |        2 |
++---------------+----------+
+6 rows in set (0.01 sec)
+
+--------------
+/* TASK 04 */
+set @rundate = current_date
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+set @m1 	= a_testbed.PrevMonth(@rundate, 6)
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+set @m2		= a_testbed.PrevMonth(@rundate, 5)
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+set @m3 	= a_testbed.PrevMonth(@rundate, 4)
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+select @rundate, @m1, @m2, @m3
+--------------
+
+*************************** 1. row ***************************
+@rundate: 2013-07-18
+     @m1: 2013-01
+     @m2: 2013-02
+     @m3: 2013-03
+1 row in set (0.00 sec)
+
+--------------
+select distinct
+	c_id
+,	c_name
+from a_bkorders.bkv_custorders 
+where c_id in (
+	select c_id
+	from a_bkorders.bkv_custorders
+	where date_format(order_date, '%Y-%m') = @m1)
+and c_id in (
+	select c_id
+	from a_bkorders.bkv_custorders
+	where date_format(order_date, '%Y-%m') = @m2)
+and c_id in (
+	select c_id
+	from a_bkorders.bkv_custorders
+	where date_format(order_date, '%Y-%m') = @m3)
+--------------
+
+Empty set (0.00 sec)
+
+--------------
+ 	
+/* TASK 05 */
+set @m5		= a_testbed.PrevMonth(@rundate, 2)
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+set @m6 	= a_testbed.PrevMonth(@rundate, 1)
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+select @rundate, @m5, @m6
+--------------
+
+*************************** 1. row ***************************
+@rundate: 2013-07-18
+     @m5: 2013-05
+     @m6: 2013-06
+1 row in set (0.00 sec)
+
+--------------
+select
+	count(*) as 'NumOrders'
+,	count(distinct cust_id) as 'NumCust'
+from a_bkorders.order_headers
+where 	date_format(order_date, '%Y-%m') = @m5
+or 		date_format(order_date, '%Y-%m') = @m6
+--------------
+
++-----------+---------+
+| NumOrders | NumCust |
++-----------+---------+
+|        16 |      12 |
++-----------+---------+
+1 row in set (0.00 sec)
+
+Bye

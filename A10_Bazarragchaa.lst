@@ -1,0 +1,408 @@
+--------------
+-- Zorigt Bazarragchaa
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+ /* enable warnings! */
+
+/* TASK 00 */
+select user(), current_date(), version(), @@sql_mode
+--------------
+
+*************************** 1. row ***************************
+        user(): zorigt@localhost
+current_date(): 2013-07-14
+     version(): 5.6.12
+    @@sql_mode: STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+1 row in set (0.00 sec)
+
+--------------
+/* TASK 01 */
+select
+	B.book_id
+,	B.title
+from a_bkinfo.books B
+where B.book_id in (
+	select 
+		OD.book_id
+	from a_bkorders.order_details OD)
+and B.book_id in(
+	select 
+		BT.book_id
+	from a_bkinfo.book_topics BT
+	where BT.topic_id in ('SQL', 'DB'))
+order by B.book_id
+--------------
+
++---------+-----------------------------------------+
+| book_id | title                                   |
++---------+-----------------------------------------+
+|    1105 | SQL:1999 Relational Language Concepts   |
+|    1106 | SQL for Smarties                        |
+|    1107 | SQL Puzzles and Answers                 |
+|    1108 | Database Systems                        |
+|    1109 | Intro to DB Systems-7th Ed              |
+|    1110 | Adv SQL:1999 Object_Relational Features |
+|    1128 | Temporal Data and the Relational Model  |
+|    1142 | Relational Database Theory              |
+|    1161 | SQL Programming Style                   |
+|    1162 | Trees and Hierarchies                   |
+|    1175 | MySQL in a Nutshell                     |
+|    1180 | MySQL Database Design and Tuning        |
+|    1182 | MySQL Cookbook                          |
+|    1184 | MySQL Developer's Library               |
+|    1185 | MySQL Stored Procedures                 |
+|    1188 | SQL for MySQL Developers                |
+|    1278 | Beginning VB 2008 Databases             |
+|    1306 | Myths of SQL                            |
+|    1483 | Programming with XML                    |
+|    2002 | SQL Server 2005 A Beginner's Guide      |
+|    2004 | SQL Server 2005 Stored Procedure Prg    |
+|    2005 | Developer's Guide to SQL Server 2005    |
+|    2006 | T_SQL Programming (Inside series)       |
+|    2007 | T_SQL Querying (Inside series)          |
+|    2008 | SQL Server 2005 T_Sql Recipies          |
+|    2009 | SQL Server 2005 Express Edition         |
+|    2018 | Oracle Database 11g SQL                 |
+|    2025 | Oracle SQL Fundamentals I Exam Guide    |
++---------+-----------------------------------------+
+28 rows in set (0.00 sec)
+
+--------------
+/* TASK 02 */
+select
+	B.book_id
+,	B.title
+from a_bkinfo.books B
+where B.book_id in (
+	select
+		OD.book_id
+	from a_bkorders.order_details OD
+	group by OD.book_id
+	having sum(OD.quantity) >= all(
+		select sum(a.quantity)
+		from a_bkorders.order_details a
+		group by a.book_id)
+)
+--------------
+
++---------+---------------------------+
+| book_id | title                     |
++---------+---------------------------+
+|    1305 | Journeys Through Flatland |
++---------+---------------------------+
+1 row in set (0.01 sec)
+
+--------------
+/* TASK 03 */
+select
+	C.cust_id
+,	C.cust_name_last
+from a_bkorders.customers C
+where C.cust_id in (
+	select
+		OH.cust_id
+	from a_bkorders.order_headers OH
+	group by OH.cust_id
+	having count(OH.order_id) <= 5 )
+order by C.cust_id
+--------------
+
++---------+----------------+
+| cust_id | cust_name_last |
++---------+----------------+
+|  208950 | Adams          |
+|  211483 | Carroll        |
+|  224038 | Austin         |
+|  226656 | Randall        |
+|  228175 | Cardin         |
+|  234709 | Brahms         |
+|  258595 | Jobs           |
+|  260368 | Muller         |
+|  263119 | Jones          |
+|  272611 | Jarrett        |
+|  296598 | Collins        |
++---------+----------------+
+11 rows in set (0.00 sec)
+
+--------------
+/* TASK 04 */
+select
+	B.book_id
+,	B.title
+,	case when exists (
+	select 'X'
+	from a_bkorders.order_details OD
+	where OD.book_id = B.book_id
+	) then 'Have orders'
+	else 'No orders'
+	end as OrderStatus
+from a_bkinfo.books B
+where B.title like "%Bird%"
+order by 3 desc, B.book_id
+--------------
+
++---------+------------------------------------------------+-------------+
+| book_id | title                                          | OrderStatus |
++---------+------------------------------------------------+-------------+
+|    1621 | The Unfeathered Bird                           | No orders   |
+|    1622 | Bird Sense                                     | No orders   |
+|    2029 | The Forgotten Bird Strikes Back                | No orders   |
+|    1104 | Sibley Guide to Bird Life and Behavior         | Have orders |
+|    1357 | Why Birds Sing                                 | Have orders |
+|    1425 | The Singing Life of Birds                      | Have orders |
+|    1448 | Backyard Birdsong Guide: Western North America | Have orders |
+|    1537 | The BedSide Book of Birds                      | Have orders |
+|    1978 | Acoustic Communication in Birds Vol1           | Have orders |
++---------+------------------------------------------------+-------------+
+9 rows in set (0.00 sec)
+
+--------------
+/* TASK 05 */
+select
+	B.book_id
+,	B.title
+from a_bkinfo.books B
+where (exists ( /* Testing title that has SSRV and ORA but not MySQL */
+		select 'X'
+		from a_bkinfo.book_topics BT
+		where BT.book_id = B.book_id
+		and BT.topic_id = 'SSRV')
+	and exists (
+		select 'X'
+		from a_bkinfo.book_topics BT
+		where BT.book_id = B.book_id
+		and BT.topic_id = 'ORA')
+	and not exists (
+		select 'X'
+		from a_bkinfo.book_topics BT
+		where BT.book_id = B.book_id
+		and BT.topic_id = 'MySQL'))
+or (exists ( /* Testing title that has SSRV and MySQL but not ORA */
+		select 'X'
+		from a_bkinfo.book_topics BT
+		where BT.book_id = B.book_id
+		and BT.topic_id = 'SSRV')
+	and not exists (
+		select 'X'
+		from a_bkinfo.book_topics BT
+		where BT.book_id = B.book_id
+		and BT.topic_id = 'ORA')
+	and exists ( 
+		select 'X'
+		from a_bkinfo.book_topics BT
+		where BT.book_id = B.book_id
+		and BT.topic_id = 'MySQL'))
+or (exists ( /* Testing title that has MySQL and ORA but not SSRV */
+		select 'X'
+		from a_bkinfo.book_topics BT
+		where BT.book_id = B.book_id
+		and BT.topic_id = 'MySQL')
+	and exists (
+		select 'X'
+		from a_bkinfo.book_topics BT
+		where BT.book_id = B.book_id
+		and BT.topic_id = 'ORA')
+	and not exists (
+		select 'X'
+		from a_bkinfo.book_topics BT
+		where BT.book_id = B.book_id
+		and BT.topic_id = 'SSRV'))
+--------------
+
++---------+----------------------------+
+| book_id | title                      |
++---------+----------------------------+
+|    2028 | Mastering Oracle Databases |
+|    2031 | Comparative SQL            |
++---------+----------------------------+
+2 rows in set (0.00 sec)
+
+--------------
+/* TASK 06 */
+select
+	C.cust_id
+,	C.cust_name_last
+from a_bkorders.customers C
+where exists (
+	select 'X'
+	from a_bkorders.order_headers OH
+	where OH.cust_id = C.cust_id
+	and extract(year from OH.order_date) = extract(year from current_date() ) - 1 
+	and extract(month from OH.order_date) in (10, 11, 12))
+order by C.cust_id
+--------------
+
++---------+----------------+
+| cust_id | cust_name_last |
++---------+----------------+
+|  200368 | Blake          |
+|  217796 | Anders         |
+|  218709 | Bonnard        |
+|  221297 | Dodgson        |
+|  222477 | Rossetti       |
+|  227105 | Kafka          |
+|  259906 | Capybara       |
+|  261502 | Hawthorne      |
+|  267780 | Shelly         |
+|  272787 | Carlson        |
+|  276381 | Collins        |
+|  290298 | Swift          |
++---------+----------------+
+12 rows in set (0.00 sec)
+
+--------------
+/* TASK 07 */
+select
+	A.author_name_first
+,	A.author_name_last
+,	A.author_id
+from a_bkinfo.authors A
+where exists (
+	select 'X'
+	from a_bkinfo.book_authors BA
+	where BA.author_id = A.author_id
+	and not exists (
+		select 'X'
+		from a_bkorders.order_details OD
+		where OD.book_id = BA.book_id))
+and exists (
+	select 'X'
+	from a_bkinfo.book_authors BA
+	where BA.author_id = A.author_id
+	group by BA.author_id
+	having count(BA.book_id) > 1
+)
+order by A.author_id
+--------------
+
++-------------------+------------------+-----------+
+| author_name_first | author_name_last | author_id |
++-------------------+------------------+-----------+
+| Stephen Jay       | Gould            | G5050     |
+| Terry             | Incognito        | I5110     |
+| Willie            | Mammoth          | M3110     |
+| Pete              | Moss             | M4540     |
+| E.O.              | Wilson           | W3145     |
++-------------------+------------------+-----------+
+5 rows in set (0.00 sec)
+
+--------------
+/* TASK 08 */
+select
+	C.cust_id
+,	C.cust_name_last
+,	coalesce(first_ord, 'No Order') as FirstOrder
+,	coalesce(last_ord, 'No Order') as LastOrder
+,	coalesce(total_ords, 'No Order') as Orders
+,	coalesce(total_sales, 'No Order') as Sales 
+from a_bkorders.customers C
+left join (
+	select 
+		OHS.cust_id
+	,	OHS.order_id
+	,	min(order_date) as first_ord
+	, 	max(order_date) as last_ord
+	,	count(OHS.order_id) as total_ords
+	,	sum(D.order_price) as total_sales
+	from a_bkorders.order_headers OHS
+	left join (
+		select
+			ODS.order_id
+		,	ODS.order_price
+		from a_bkorders.order_details ODS
+		) D on D.order_id = OHS.order_id
+	group by cust_id
+) H on C.cust_id = H.cust_id
+group by C.cust_id
+--------------
+
++---------+----------------+------------+------------+----------+----------+
+| cust_id | cust_name_last | FirstOrder | LastOrder  | Orders   | Sales    |
++---------+----------------+------------+------------+----------+----------+
+|  200368 | Blake          | 2011-10-28 | 2013-03-08 | 10       | 416.99   |
+|  202958 | Denver         | No Order   | No Order   | No Order | No Order |
+|  208950 | Adams          | 2012-09-28 | 2012-09-28 | 1        | 10.95    |
+|  211483 | Carroll        | 2012-03-12 | 2012-05-17 | 5        | 170.85   |
+|  212921 | Books on Tap   | 2012-05-16 | 2013-05-24 | 21       | 655.98   |
+|  217002 | Grieg          | No Order   | No Order   | No Order | No Order |
+|  217796 | Anders         | 2012-03-10 | 2012-10-06 | 23       | 656.40   |
+|  218709 | Bonnard        | 2012-08-08 | 2013-06-09 | 15       | 614.17   |
+|  221297 | Dodgson        | 2012-02-18 | 2013-02-12 | 19       | 693.94   |
+|  222477 | Rossetti       | 2012-01-12 | 2013-06-05 | 18       | 695.63   |
+|  224038 | Austin         | 2012-09-02 | 2013-05-26 | 11       | 926.21   |
+|  226275 | Dalrymple      | No Order   | No Order   | No Order | No Order |
+|  226656 | Randall        | 2012-01-25 | 2013-01-25 | 5        | 168.00   |
+|  227105 | Kafka          | 2012-01-12 | 2013-06-30 | 20       | 733.38   |
+|  228175 | Cardin         | 2013-05-05 | 2013-05-06 | 3        | 280.12   |
+|  228275 | Mikulski       | No Order   | No Order   | No Order | No Order |
+|  228352 | Edwards        | No Order   | No Order   | No Order | No Order |
+|  234138 | Keats          | 2012-03-10 | 2013-04-02 | 12       | 372.87   |
+|  234709 | Brahms         | 2012-09-18 | 2012-09-22 | 7        | 258.15   |
+|  239427 | Marksa         | 2012-09-04 | 2013-05-04 | 17       | 629.83   |
+|  255919 | Milton         | No Order   | No Order   | No Order | No Order |
+|  258595 | Jobs           | 2012-05-20 | 2013-02-20 | 2        | 25.00    |
+|  259906 | Capybara       | 2011-10-02 | 2013-06-04 | 16       | 547.52   |
+|  259907 | Hedge          | No Order   | No Order   | No Order | No Order |
+|  259969 | Carlsen        | No Order   | No Order   | No Order | No Order |
+|  260368 | Muller         | 2012-09-05 | 2013-05-05 | 2        | 99.90    |
+|  261502 | Hawthorne      | 2012-05-08 | 2013-06-29 | 21       | 809.14   |
+|  263119 | Jones          | 2011-10-23 | 2012-09-28 | 6        | 199.44   |
+|  267780 | Shelly         | 2011-10-28 | 2013-03-01 | 26       | 830.04   |
+|  272611 | Jarrett        | 2012-09-10 | 2012-09-10 | 1        | 15.00    |
+|  272787 | Carlson        | 2012-02-15 | 2013-06-02 | 26       | 709.49   |
+|  276381 | Collins        | 2012-08-15 | 2013-04-15 | 7        | 235.93   |
+|  282716 | Biederbecke    | 2013-03-04 | 2013-03-26 | 24       | 1016.87  |
+|  287261 | Biederbecke    | No Order   | No Order   | No Order | No Order |
+|  290298 | Swift          | 2012-02-20 | 2013-06-30 | 16       | 535.22   |
+|  296598 | Collins        | 2012-06-20 | 2012-06-20 | 1        | 12.00    |
+|  299099 | Sam            | No Order   | No Order   | No Order | No Order |
++---------+----------------+------------+------------+----------+----------+
+37 rows in set (0.00 sec)
+
+--------------
+/* TASK 09 */
+select 
+	C.cust_id as Cust_ID
+,	C.cust_name_last as Cust_LastName
+from a_bkorders.order_headers OH
+join (
+	select
+		cust_id
+	,	cust_name_last
+	from a_bkorders.customers
+	) C on OH.cust_id = C.cust_id
+join (
+	select
+		order_id
+	,	order_line
+	,	book_id
+	from a_bkorders.order_details od
+	where exists (
+		select 'X'
+		from a_bkorders.order_details ods
+		where ods.order_id = od.order_id
+		and ods.book_id = od.book_id
+		and not ods.order_line = od.order_line
+	)) ODD on ODD.order_id = OH.order_id
+--------------
+
++---------+---------------+
+| Cust_ID | Cust_LastName |
++---------+---------------+
+|  239427 | Marksa        |
+|  239427 | Marksa        |
+|  259906 | Capybara      |
+|  259906 | Capybara      |
+|  259906 | Capybara      |
+|  259906 | Capybara      |
+|  282716 | Biederbecke   |
+|  282716 | Biederbecke   |
+|  290298 | Swift         |
+|  290298 | Swift         |
++---------+---------------+
+10 rows in set (0.00 sec)
+
+Bye

@@ -1,0 +1,1 @@
+mysql -u zorigt -p -vvv --force --comments < C:\db_scripts\A01_Bazarragchaa.sql > C:\db_scripts\A01_Bazarragchaa.lst

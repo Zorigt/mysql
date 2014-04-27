@@ -1,0 +1,296 @@
+--------------
+-- Zorigt Bazarragchaa
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+ /* enable warnings! */
+
+
+/* TASK 00 */
+select user(), current_date(), version(), @@sql_mode
+--------------
+
+*************************** 1. row ***************************
+        user(): zorigt@localhost
+current_date(): 2013-07-08
+     version(): 5.6.12
+    @@sql_mode: STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+1 row in set (0.00 sec)
+
+--------------
+/* TASK 01 */
+select
+	OD.book_id
+,	round(avg(OD.order_price), 0) as AvgPrice
+,	sum(OD.quantity) as CopiesOrdered
+from a_bkorders.order_details OD
+group by OD.book_id
+--------------
+
++---------+----------+---------------+
+| book_id | AvgPrice | CopiesOrdered |
++---------+----------+---------------+
+|    1077 |       11 |            22 |
+|    1101 |       58 |            36 |
+|    1102 |       50 |             4 |
+|    1103 |       12 |           406 |
+|    1104 |       45 |           127 |
+|    1105 |       55 |            80 |
+|    1106 |       28 |           134 |
+|    1107 |       23 |            88 |
+|    1108 |       28 |           600 |
+|    1109 |       34 |            51 |
+|    1110 |       50 |             4 |
+|    1128 |       42 |           758 |
+|    1133 |       18 |             5 |
+|    1142 |       35 |           247 |
+|    1161 |       35 |            64 |
+|    1162 |       34 |           161 |
+|    1175 |       38 |             3 |
+|    1180 |       48 |             7 |
+|    1182 |       45 |           142 |
+|    1184 |       50 |             1 |
+|    1185 |       50 |             1 |
+|    1188 |       50 |             1 |
+|    1199 |       18 |            14 |
+|    1200 |       16 |             5 |
+|    1258 |       45 |             6 |
+|    1269 |       59 |             1 |
+|    1278 |       48 |             1 |
+|    1279 |       39 |            10 |
+|    1301 |       46 |            30 |
+|    1304 |       51 |           111 |
+|    1305 |        7 |           898 |
+|    1306 |      250 |            15 |
+|    1357 |       24 |            54 |
+|    1401 |       55 |           541 |
+|    1425 |       27 |            51 |
+|    1448 |       27 |           892 |
+|    1457 |       54 |             5 |
+|    1478 |       45 |             5 |
+|    1483 |       18 |             5 |
+|    1537 |       27 |            58 |
+|    1619 |       29 |           110 |
+|    1625 |        4 |             1 |
+|    1626 |       20 |             1 |
+|    1627 |      200 |             1 |
+|    1628 |       32 |            14 |
+|    1629 |       20 |            12 |
+|    1670 |       40 |            60 |
+|    1678 |       50 |             5 |
+|    1689 |       55 |            13 |
+|    1774 |       15 |             1 |
+|    1776 |       45 |           203 |
+|    1835 |       46 |             1 |
+|    1877 |       45 |             1 |
+|    1894 |       34 |            10 |
+|    1948 |       41 |             7 |
+|    1978 |       94 |            25 |
+|    1979 |       54 |             1 |
+|    2001 |       38 |           291 |
+|    2002 |       28 |            27 |
+|    2004 |       50 |             1 |
+|    2005 |       45 |            20 |
+|    2006 |       29 |            39 |
+|    2007 |       36 |            43 |
+|    2008 |       40 |            98 |
+|    2009 |       31 |            39 |
+|    2018 |       50 |             2 |
+|    2025 |       39 |           560 |
+|    2028 |       58 |             9 |
++---------+----------+---------------+
+68 rows in set (0.00 sec)
+
+--------------
+/* TASK 02 */
+ select
+	T.topic_id as ID
+,	T.topic_descr
+,	coalesce(count(BT.book_id), 0) as NumberofBooks
+, 	round(coalesce(avg(B.list_price), 'n/a'), 2) as AvgListPrice 
+from a_bkinfo.topics T
+left join a_bkinfo.book_topics BT using (topic_id)
+left join a_bkinfo.books B using (book_id)
+group by T.topic_id
+--------------
+
++-------+------------------------+---------------+--------------+
+| ID    | topic_descr            | NumberofBooks | AvgListPrice |
++-------+------------------------+---------------+--------------+
+| ADO   | ADO                    |             2 |        54.99 |
+| ART   | Arts, Photography      |             1 |        31.29 |
+| CMP   | Computer Science       |             0 |         0.00 |
+| DB    | Database Systems       |            10 |        58.87 |
+| FCT   | Fiction                |             3 |       107.32 |
+| HIST  | History                |             1 |         1.99 |
+| MySQL | MySQL Database         |             8 |        49.36 |
+| NET   | .NET Technologies      |            13 |        53.45 |
+| NOSQL | Alternate data storage |             0 |         0.00 |
+| ORA   | Oracle Database        |             7 |        60.85 |
+| PGM   | General Programming    |             4 |        30.06 |
+| POE   | Poetry                 |             5 |        38.44 |
+| SCI   | Science                |            22 |        40.85 |
+| SQL   | SQL                    |            27 |        55.62 |
+| SSRV  | SQL Server Database    |            12 |        53.74 |
+| VB    | Visual Basic           |            11 |        53.17 |
+| XML   | XML Techniques         |             2 |        41.97 |
++-------+------------------------+---------------+--------------+
+17 rows in set (0.00 sec)
+
+--------------
+/* TASK 03 */
+select
+	count(*) as NumberOrders
+,	count(distinct OH.cust_id) as NumberCustWithOrders
+from a_bkorders.order_details OD
+join a_bkorders.order_headers OH using (order_id)
+where year(OH.order_date) = year(now())
+and	month(OH.order_date) = month(date_sub(now(), interval 1 month))
+--------------
+
++--------------+----------------------+
+| NumberOrders | NumberCustWithOrders |
++--------------+----------------------+
+|           13 |                    7 |
++--------------+----------------------+
+1 row in set (0.00 sec)
+
+--------------
+/* TASK 04 */
+set @t_id = 'SCI'
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+select
+	count(*) as "NumOrders Indicated Topic"
+from a_bkinfo.book_topics BT
+join a_bkorders.order_details OD using (book_id)
+where BT.topic_id = @t_id
+--------------
+
++---------------------------+
+| NumOrders Indicated Topic |
++---------------------------+
+|                        59 |
++---------------------------+
+1 row in set (0.00 sec)
+
+--------------
+/* TASK 05 */
+select
+	concat(P.publ_id, ' ', P.publ_name) as Publisher
+,	coalesce(max(OH.order_date), 'No Orders') as MostRecentOrder
+,	coalesce(min(OH.order_date), 'No Orders') as OldestOrder
+from a_bkinfo.publishers P
+left join a_bkinfo.books using (publ_id)
+left join a_bkorders.order_details using (book_id)
+left join a_bkorders.order_headers OH using (order_id)
+group by P.publ_id
+--------------
+
++------------------------------+-----------------+-------------+
+| Publisher                    | MostRecentOrder | OldestOrder |
++------------------------------+-----------------+-------------+
+| 9000 Microsoft Press         | 2013-06-05      | 2011-10-23  |
+| 9020 Princeton Univer Press  | No Orders       | No Orders   |
+| 9021 Yale University Press   | 2013-03-26      | 2013-03-26  |
+| 9022 Havard University Press | 2013-03-22      | 2013-03-13  |
+| 9030 McGraw Hill             | 2012-09-28      | 2012-09-10  |
+| 9102 Alfred A. Knopf         | 2013-05-26      | 2012-02-12  |
+| 9325 Addison Wesley          | 2013-05-05      | 2011-10-28  |
+| 9444 APress                  | 2013-06-29      | 2011-10-02  |
+| 9456 New Directions          | 2013-06-04      | 2012-02-12  |
+| 9507 J.Q. Vanderbildt        | No Orders       | No Orders   |
+| 9521 Benjamin/Cummings       | 2013-05-24      | 2011-10-28  |
+| 9528 Manning                 | No Orders       | No Orders   |
+| 9561 Houghton Mifflin        | 2013-06-29      | 2012-02-04  |
+| 9623 Prentice Hall           | 2012-07-18      | 2012-07-18  |
+| 9664 WROX                    | 2013-06-02      | 2012-02-28  |
+| 9725 Springer                | 2013-06-09      | 2012-05-12  |
+| 9745 Morgan Kaufmann         | 2013-06-30      | 2011-10-28  |
+| 9822 O'Reilly                | 2013-06-30      | 2011-10-28  |
+| 9825 MySQL Press             | 2012-09-30      | 2012-05-16  |
+| 9902 W.W. Norton             | 2013-06-09      | 2012-07-18  |
++------------------------------+-----------------+-------------+
+20 rows in set (0.00 sec)
+
+--------------
+/* TASK 06 */
+select
+	concat(P.publ_id, ' ', P.publ_name) as Publisher
+from a_bkinfo.publishers P
+join a_bkinfo.books B using (publ_id)
+join a_bkinfo.book_topics BT using (book_id)
+where BT.topic_id in ('PGM', 'VB', 'NET', 'ADO')
+group by P.publ_id
+having count(B.book_id) between 4 and 10
+--------------
+
++---------------------+
+| Publisher           |
++---------------------+
+| 9325 Addison Wesley |
+| 9444 APress         |
++---------------------+
+2 rows in set (0.00 sec)
+
+--------------
+/* TASK 07 */
+select
+	count(distinct case when BT.topic_id in ('SCI') then BT.book_id else null end) as "Science"
+,	count(distinct case when BT.topic_id in ('PGM', 'VB', 'NET', 'ADO') then BT.book_id else null end) "Programming"
+,	count(distinct case when BT.topic_id in ('DB', 'SQL', 'SSRV', 'MySQL', 'ORA', 'ADO') then BT.book_id else null end) "Database/SQL"
+,	count(distinct case when BT.topic_id in ('FCT', 'POE') then BT.book_id else null end) "Fiction/Poetry"
+,	count(*) as "All Books"
+from a_bkinfo.book_topics BT
+--------------
+
++---------+-------------+--------------+----------------+-----------+
+| Science | Programming | Database/SQL | Fiction/Poetry | All Books |
++---------+-------------+--------------+----------------+-----------+
+|      22 |          22 |           39 |              7 |       128 |
++---------+-------------+--------------+----------------+-----------+
+1 row in set (0.00 sec)
+
+--------------
+/* TASK 08 */
+select
+	date_format(OH.order_date, '%Y-%M') as "Year-month"
+,	count(*) as "NumberOrders"
+,	round(sum(OD.order_price), 2) as "TotalSales"
+from a_bkorders.order_details OD
+join a_bkorders.order_headers OH using (order_id)
+group by date_format(OH.order_date, '%Y-%M')
+order by year(OH.order_date), month(OH.order_date)
+--------------
+
++----------------+--------------+------------+
+| Year-month     | NumberOrders | TotalSales |
++----------------+--------------+------------+
+| 2011-October   |            9 |     398.84 |
+| 2012-January   |           17 |     583.84 |
+| 2012-February  |           17 |     601.67 |
+| 2012-March     |            4 |     110.90 |
+| 2012-April     |           16 |     505.14 |
+| 2012-May       |           16 |     515.97 |
+| 2012-June      |            5 |      87.00 |
+| 2012-July      |           15 |     473.89 |
+| 2012-August    |            8 |     298.61 |
+| 2012-September |           76 |    2837.96 |
+| 2012-October   |           22 |     735.41 |
+| 2012-November  |           11 |     512.63 |
+| 2012-December  |           21 |     774.54 |
+| 2013-January   |           13 |     518.79 |
+| 2013-February  |            9 |     262.54 |
+| 2013-March     |           38 |    1488.68 |
+| 2013-April     |            6 |     202.93 |
+| 2013-May       |           13 |     860.67 |
+| 2013-June      |           13 |     549.01 |
++----------------+--------------+------------+
+19 rows in set (0.00 sec)
+
+Bye

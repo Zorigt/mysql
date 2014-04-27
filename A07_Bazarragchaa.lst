@@ -1,0 +1,696 @@
+--------------
+-- Zorigt Bazarragchaa
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+ /* enable warnings! */
+
+
+
+/* TASK 00 */
+select user(), current_date(), version(), @@sql_mode
+--------------
+
+*************************** 1. row ***************************
+        user(): zorigt@localhost
+current_date(): 2013-07-05
+     version(): 5.6.12
+    @@sql_mode: STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+1 row in set (0.00 sec)
+
+--------------
+/* TASK 01 */
+select
+	CS.cust_id
+,	CS.cust_name_last
+, 	BS.title
+from a_bkorders.customers CS
+join a_bkorders.order_headers OH using (cust_id)
+join a_bkorders.order_details OD using (order_id)
+join a_bkinfo.books BS using (book_id)
+where not find_in_set(CS.cust_state, 'IL,ID,IA,KS,MI,MN,MS,NE,ND,OH,SD,WI')
+order by BS.title
+limit 20
+--------------
+
++---------+----------------+------------------------------------------------+
+| cust_id | cust_name_last | title                                          |
++---------+----------------+------------------------------------------------+
+|  218709 | Bonnard        | .Net Development for Microsoft Office          |
+|  282716 | Biederbecke    | .Net Development for Microsoft Office          |
+|  261502 | Hawthorne      | Acoustic Communication in Birds Vol1           |
+|  261502 | Hawthorne      | Acoustic Communication in Birds Vol1           |
+|  282716 | Biederbecke    | Acoustic Communication in Birds Vol1           |
+|  224038 | Austin         | ADO and Oracle Workbook                        |
+|  224038 | Austin         | ADO and Oracle Workbook                        |
+|  227105 | Kafka          | Adv SQL:1999 Object_Relational Features        |
+|  261502 | Hawthorne      | Adv SQL:1999 Object_Relational Features        |
+|  212921 | Books on Tap   | Backyard Birdsong Guide: Western North America |
+|  259906 | Capybara       | Backyard Birdsong Guide: Western North America |
+|  211483 | Carroll        | Backyard Birdsong Guide: Western North America |
+|  282716 | Biederbecke    | Backyard Birdsong Guide: Western North America |
+|  212921 | Books on Tap   | Backyard Birdsong Guide: Western North America |
+|  200368 | Blake          | Backyard Birdsong Guide: Western North America |
+|  282716 | Biederbecke    | Bark: A Field Guide to Trees of the Northeast  |
+|  261502 | Hawthorne      | Beginning OO Programming with VB 2005          |
+|  261502 | Hawthorne      | Data-Driven Services with Silverlight 2        |
+|  261502 | Hawthorne      | Data-Driven Services with Silverlight 2        |
+|  212921 | Books on Tap   | Data-Driven Services with Silverlight 2        |
++---------+----------------+------------------------------------------------+
+20 rows in set (0.00 sec)
+
+--------------
+/* TASK 02 */
+set @tp_id = 'SQL'
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+select
+	BS.book_id
+,	BS.title
+,	BT.topic_id
+from a_bkinfo.books BS
+join a_bkinfo.book_topics BT using (book_id)
+where BS.title regexp 'SQL'
+and BT.topic_id <> @tp_id
+--------------
+
++---------+-----------------------------------------+----------+
+| book_id | title                                   | topic_id |
++---------+-----------------------------------------+----------+
+|    1101 | Programming SQL Server with VB.NET      | NET      |
+|    1101 | Programming SQL Server with VB.NET      | SSRV     |
+|    1101 | Programming SQL Server with VB.NET      | VB       |
+|    1105 | SQL:1999 Relational Language Concepts   | DB       |
+|    1110 | Adv SQL:1999 Object_Relational Features | DB       |
+|    1175 | MySQL in a Nutshell                     | MySQL    |
+|    1180 | MySQL Database Design and Tuning        | DB       |
+|    1180 | MySQL Database Design and Tuning        | MySQL    |
+|    1182 | MySQL Cookbook                          | MySQL    |
+|    1184 | MySQL Developer's Library               | MySQL    |
+|    1185 | MySQL Stored Procedures                 | MySQL    |
+|    1188 | SQL for MySQL Developers                | MySQL    |
+|    1245 | A Scientific Approach to SQL Testing    | DB       |
+|    1306 | Myths of SQL                            | FCT      |
+|    1877 | High Performance MySQL                  | MySQL    |
+|    2001 | Programming SQL Server 2005             | SSRV     |
+|    2002 | SQL Server 2005 A Beginner's Guide      | SSRV     |
+|    2003 | SQL Server 2005 Developer's Guide       | SSRV     |
+|    2004 | SQL Server 2005 Stored Procedure Prg    | SSRV     |
+|    2005 | Developer's Guide to SQL Server 2005    | SSRV     |
+|    2006 | T_SQL Programming (Inside series)       | SSRV     |
+|    2007 | T_SQL Querying (Inside series)          | SSRV     |
+|    2008 | SQL Server 2005 T_Sql Recipies          | SSRV     |
+|    2009 | SQL Server 2005 Express Edition         | SSRV     |
+|    2018 | Oracle Database 11g SQL                 | ORA      |
+|    2025 | Oracle SQL Fundamentals I Exam Guide    | ORA      |
+|    2027 | Mastering Oracle SQL and SQL-Plus       | ORA      |
+|    2031 | Comparative SQL                         | ORA      |
+|    2031 | Comparative SQL                         | SSRV     |
++---------+-----------------------------------------+----------+
+29 rows in set (0.00 sec)
+
+--------------
+/* TASK 03 */
+select distinct
+	books.book_id
+,	substring(books.title, 1, 20) as 'Title 20 Chars'
+,	case
+		when book_topics.topic_id = 'POE' then round(books.list_price, -1)
+		when book_topics.topic_id = 'PGM' then round(books.list_price, -1)
+		else books.list_price
+	end as 'List Price'
+from a_bkinfo.books
+join a_bkinfo.book_topics using (book_id)
+order by case books.list_price
+			when book_topics.topic_id = 'POE' then round(books.list_price, -1)
+			when book_topics.topic_id = 'PGM' then round(books.list_price, -1)
+			else books.list_price
+		end 
+		, books.book_id
+--------------
+
++---------+----------------------+------------+
+| book_id | Title 20 Chars       | List Price |
++---------+----------------------+------------+
+|    2029 | The Forgotten Bird S |       1.99 |
+|    1625 | Winter Weed Finder:  |       4.95 |
+|    1103 | Selected Poems       |      10.00 |
+|    1774 | Ever Since Darwin    |      15.95 |
+|    1200 | The Mismeasure of Ma |      17.95 |
+|    1234 | Hen's Teeth and Hors |      17.95 |
+|    1609 | In the Company of Cr |      18.95 |
+|    1133 | Leaves of Grass      |      20.00 |
+|    1629 | The Leafcutter Ants: |      19.95 |
+|    1483 | Programming with XML |      19.99 |
+|    1483 | Programming with XML |      20.00 |
+|    1624 | Outstanding Mosses a |      19.99 |
+|    1107 | SQL Puzzles and Answ |      25.00 |
+|    1622 | Bird Sense           |      25.00 |
+|    1626 | Bark: A Field Guide  |      25.95 |
+|    1357 | Why Birds Sing       |      26.00 |
+|    1630 | The Social Conquest  |      27.95 |
+|    1425 | The Singing Life of  |      28.09 |
+|    1106 | SQL for Smarties     |      29.00 |
+|    1537 | The BedSide Book of  |      29.95 |
+|    1448 | Backyard Birdsong Gu |      29.99 |
+|    1525 | Interface-Oriented D |      30.00 |
+|    1619 | The Oject-Oriented T |      30.00 |
+|    2009 | SQL Server 2005 Expr |      29.99 |
+|    1621 | The Unfeathered Bird |      31.29 |
+|    1628 | The Superorganism:Th |      34.65 |
+|    1175 | MySQL in a Nutshell  |      34.99 |
+|    1161 | SQL Programming Styl |      35.00 |
+|    1162 | Trees and Hierarchie |      35.00 |
+|    1108 | Database Systems     |      39.95 |
+|    1894 | Programming Visual B |      39.99 |
+|    2002 | SQL Server 2005 A Be |      39.99 |
+|    2027 | Mastering Oracle SQL |      39.99 |
+|    1077 | Programming for Poet |      40.00 |
+|    1278 | Beginning VB 2008 Da |      44.99 |
+|    1279 | Data-Driven Services |      44.99 |
+|    1478 | Beginning OO Program |      44.99 |
+|    1948 | Framework Design Gui |      44.99 |
+|    2006 | T_SQL Programming (I |      44.99 |
+|    2007 | T_SQL Querying (Insi |      44.99 |
+|    1104 | Sibley Guide to Bird |      45.00 |
+|    1128 | Temporal Data and th |      49.95 |
+|    1102 | Practical Standards  |      49.99 |
+|    1180 | MySQL Database Desig |      49.99 |
+|    1182 | MySQL Cookbook       |      49.99 |
+|    1184 | MySQL Developer's Li |      49.99 |
+|    1185 | MySQL Stored Procedu |      49.99 |
+|    1188 | SQL for MySQL Develo |      49.99 |
+|    1258 | .Net Development for |      49.99 |
+|    1302 | ADO: the ebook       |      49.99 |
+|    1670 | Applied .NET Framewo |      49.99 |
+|    1678 | Pro .NET 2.0 Windows |      49.99 |
+|    1835 | Data Binding with Wi |      49.99 |
+|    1877 | High Performance MyS |      49.99 |
+|    2001 | Programming SQL Serv |      49.99 |
+|    2003 | SQL Server 2005 Deve |      49.99 |
+|    2018 | Oracle Database 11g  |      49.99 |
+|    1245 | A Scientific Approac |      52.95 |
+|    1401 | Visual Studio Tools  |      54.99 |
+|    2032 | Oracle and the rest  |      55.99 |
+|    1105 | SQL:1999 Relational  |      59.95 |
+|    1110 | Adv SQL:1999 Object_ |      59.95 |
+|    1101 | Programming SQL Serv |      59.99 |
+|    1301 | ADO and Oracle Workb |      59.99 |
+|    1303 | Rainbows and Rainbow |      60.00 |
+|    1303 | Rainbows and Rainbow |      59.99 |
+|    1304 | Stories of Discoveri |      60.00 |
+|    1304 | Stories of Discoveri |      59.99 |
+|    1689 | Programming Visual B |      59.99 |
+|    1979 | Pro VB 2008 and the  |      59.99 |
+|    2004 | SQL Server 2005 Stor |      59.99 |
+|    2005 | Developer's Guide to |      59.99 |
+|    2008 | SQL Server 2005 T_Sq |      59.99 |
+|    2025 | Oracle SQL Fundament |      59.99 |
+|    2028 | Mastering Oracle Dat |      59.99 |
+|    1269 | Querying XML         |      63.95 |
+|    1677 | Windows Forms 2.0 Pr |      74.99 |
+|    1457 | Visual Basic 2008 Re |      79.99 |
+|    1109 | Intro to DB Systems- |      80.00 |
+|    1142 | Relational Database  |      95.00 |
+|    2031 | Comparative SQL      |      99.99 |
+|    1978 | Acoustic Communicati |     103.91 |
+|    1627 | The Ants             |     120.18 |
+|    1623 | Lichens of North Ame |     135.00 |
+|    1306 | Myths of SQL         |     259.99 |
++---------+----------------------+------------+
+85 rows in set (0.00 sec)
+
+--------------
+/* TASK 04 */
+select
+	cust_id
+,	order_id
+,	order_date
+from a_bkorders.order_headers
+where dayofmonth(order_date) = 1
+--------------
+
++---------+----------+------------+
+| cust_id | order_id | order_date |
++---------+----------+------------+
+|  212921 |    23890 | 2013-05-01 |
+|  267780 |    31840 | 2012-07-01 |
+|  212921 |    32890 | 2012-09-01 |
+|  267780 |    41840 | 2013-03-01 |
++---------+----------+------------+
+4 rows in set (0.00 sec)
+
+--------------
+/* TASK 05 */
+select 
+	cust_id
+,	order_id
+,	order_date
+from a_bkorders.order_headers
+where order_date = last_day(order_date)
+--------------
+
++---------+----------+------------+
+| cust_id | order_id | order_date |
++---------+----------+------------+
+|  290298 |     1328 | 2013-06-30 |
+|  227105 |     1345 | 2013-06-30 |
+|  290298 |     5328 | 2012-11-30 |
+|  227105 |     5345 | 2012-11-30 |
+|  261502 |    22811 | 2012-09-30 |
+|  239427 |    22812 | 2012-09-30 |
+|  239427 |    22813 | 2012-09-30 |
++---------+----------+------------+
+7 rows in set (0.00 sec)
+
+--------------
+/* TASK 06 */
+set @ct_dt = curdate()
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+select 
+	cust_id
+,	order_date
+,	case
+		when datediff(@ct_dt, order_date) < 14 then 'Less than 14 days'
+		when datediff(@ct_dt, order_date) < 30 then 'Less than 30 days'
+		when datediff(@ct_dt, order_date) < 90 then 'Less than 90 days'
+		when datediff(@ct_dt, order_date) < 180 then 'Less than 180 days'
+		when datediff(@ct_dt, order_date) >= 180 then '180 days or more'
+	end as 'orderAged'
+from a_bkorders.order_headers
+where datediff(@ct_dt, order_date) > 0
+order by cust_id
+limit 20
+--------------
+
++---------+------------+--------------------+
+| cust_id | order_date | orderAged          |
++---------+------------+--------------------+
+|  200368 | 2013-03-08 | Less than 180 days |
+|  200368 | 2012-09-08 | 180 days or more   |
+|  200368 | 2012-11-28 | 180 days or more   |
+|  200368 | 2012-09-15 | 180 days or more   |
+|  200368 | 2012-10-03 | 180 days or more   |
+|  200368 | 2011-10-28 | 180 days or more   |
+|  208950 | 2012-09-28 | 180 days or more   |
+|  211483 | 2012-04-17 | 180 days or more   |
+|  211483 | 2012-04-14 | 180 days or more   |
+|  211483 | 2012-03-12 | 180 days or more   |
+|  211483 | 2012-05-17 | 180 days or more   |
+|  211483 | 2012-04-24 | 180 days or more   |
+|  212921 | 2012-07-20 | 180 days or more   |
+|  212921 | 2012-07-18 | 180 days or more   |
+|  212921 | 2012-08-05 | 180 days or more   |
+|  212921 | 2012-09-01 | 180 days or more   |
+|  212921 | 2012-09-22 | 180 days or more   |
+|  212921 | 2013-05-01 | Less than 90 days  |
+|  212921 | 2013-04-05 | Less than 180 days |
+|  212921 | 2012-09-05 | 180 days or more   |
++---------+------------+--------------------+
+20 rows in set (0.00 sec)
+
+--------------
+/* TASK 07 */
+set @ct_dt = curdate()
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+select
+	cust_id
+,	cust_name_last as 'Last Name'
+,	cust_acct_opened as 'Acct Open'
+from a_bkorders.customers
+where cust_acct_opened >= date_sub(@ct_dt, interval 8 month)
+--------------
+
++---------+-------------+------------+
+| cust_id | Last Name   | Acct Open  |
++---------+-------------+------------+
+|  226275 | Dalrymple   | 2013-01-01 |
+|  228175 | Cardin      | 2013-04-02 |
+|  228275 | Mikulski    | 2013-04-04 |
+|  228352 | Edwards     | 2013-06-08 |
+|  282716 | Biederbecke | 2013-01-01 |
++---------+-------------+------------+
+5 rows in set (0.00 sec)
+
+--------------
+/* TASK 08 */
+select 
+	a_bkorders.order_details.order_id as 'Order ID'
+,	a_bkorders.order_details.book_id as 'Book id'
+,	substring(a_bkinfo.books.title, 1, 20) as 'Title'
+,	a_bkorders.order_details.quantity * a_bkorders.order_details.order_price as 'Ext Cost'
+,	round((floor(rand() * (5-1)) + 1)/100, 2) * (a_bkorders.order_details.quantity * a_bkorders.order_details.order_price) as 'Discount Amount'
+from a_bkorders.order_details 
+join a_bkinfo.books using (book_id)
+order by a_bkorders.order_details.order_id
+--------------
+
++----------+---------+----------------------+----------+-----------------+
+| Order ID | Book id | Title                | Ext Cost | Discount Amount |
++----------+---------+----------------------+----------+-----------------+
+|     1002 |    1107 | SQL Puzzles and Answ |   275.00 |            5.50 |
+|     1002 |    1106 | SQL for Smarties     |   306.00 |            9.18 |
+|     1003 |    1104 | Sibley Guide to Bird |   225.00 |            2.25 |
+|     1004 |    1106 | SQL for Smarties     |    36.50 |            0.73 |
+|     1005 |    1107 | SQL Puzzles and Answ |    86.00 |            1.72 |
+|     1005 |    1142 | Relational Database  |    84.90 |            2.55 |
+|     1006 |    1103 | Selected Poems       |   109.50 |            2.19 |
+|     1007 |    1448 | Backyard Birdsong Gu |  1250.00 |           25.00 |
+|     1008 |    1670 | Applied .NET Framewo |  2000.00 |           40.00 |
+|     1010 |    1537 | The BedSide Book of  |  1250.00 |           25.00 |
+|     1011 |    1103 | Selected Poems       |    21.90 |            0.66 |
+|     1012 |    1128 | Temporal Data and th |    49.95 |            1.00 |
+|     1027 |    2001 | Programming SQL Serv |  1049.79 |           41.99 |
+|     1027 |    1077 | Programming for Poet |   241.78 |            9.67 |
+|     1028 |    2006 | T_SQL Programming (I |    46.95 |            0.94 |
+|     1028 |    2004 | SQL Server 2005 Stor |    49.95 |            1.00 |
+|     1028 |    2001 | Programming SQL Serv |    19.78 |            0.59 |
+|     1028 |    2002 | SQL Server 2005 A Be |   880.00 |            8.80 |
+|     1030 |    1279 | Data-Driven Services |    40.49 |            0.81 |
+|     1035 |    1689 | Programming Visual B |    55.19 |            2.21 |
+|     1039 |    1448 | Backyard Birdsong Gu |    30.00 |            0.30 |
+|     1039 |    1162 | Trees and Hierarchie |    69.90 |            0.70 |
+|     1040 |    2018 | Oracle Database 11g  |    99.98 |            3.00 |
+|     1040 |    2025 | Oracle SQL Fundament | 21840.00 |          436.80 |
+|     1045 |    1894 | Programming Visual B |    35.99 |            1.08 |
+|     1200 |    1948 | Framework Design Gui |   204.70 |            2.05 |
+|     1200 |    1199 | SQL is Fun           |    91.95 |            0.92 |
+|     1200 |    1457 | Visual Basic 2008 Re |   269.95 |            2.70 |
+|     1200 |    1894 | Programming Visual B |   183.95 |            7.36 |
+|     1200 |    1133 | Leaves of Grass      |    90.75 |            2.72 |
+|     1200 |    1128 | Temporal Data and th |   231.00 |            2.31 |
+|     1200 |    1180 | MySQL Database Desig |   229.95 |            2.30 |
+|     1200 |    1200 | The Mismeasure of Ma |    81.65 |            2.45 |
+|     1205 |    1448 | Backyard Birdsong Gu |    27.29 |            0.27 |
+|     1212 |    1894 | Programming Visual B |    18.75 |            0.19 |
+|     1212 |    1894 | Programming Visual B |    37.59 |            1.13 |
+|     1224 |    1101 | Programming SQL Serv |   441.52 |           13.25 |
+|     1253 |    1103 | Selected Poems       |    24.00 |            0.96 |
+|     1253 |    1104 | Sibley Guide to Bird |    45.00 |            0.45 |
+|     1254 |    2007 | T_SQL Querying (Insi |   390.00 |           15.60 |
+|     1254 |    2008 | SQL Server 2005 T_Sq |   469.50 |            9.39 |
+|     1255 |    1142 | Relational Database  |   195.00 |            3.90 |
+|     1255 |    1101 | Programming SQL Serv |   299.95 |            3.00 |
+|     1255 |    1162 | Trees and Hierarchie |    70.00 |            1.40 |
+|     1256 |    1104 | Sibley Guide to Bird |    45.00 |            0.90 |
+|     1256 |    1103 | Selected Poems       |    24.00 |            0.48 |
+|     1261 |    1128 | Temporal Data and th |  2347.50 |           70.42 |
+|     1261 |    2001 | Programming SQL Serv |  3900.00 |           39.00 |
+|     1261 |    1142 | Relational Database  |  3495.00 |          139.80 |
+|     1262 |    2001 | Programming SQL Serv |    39.00 |            0.78 |
+|     1262 |    2009 | SQL Server 2005 Expr |   174.75 |            6.99 |
+|     1302 |    1258 | .Net Development for |    44.99 |            1.35 |
+|     1310 |    1269 | Querying XML         |    58.83 |            0.59 |
+|     1310 |    1619 | The Oject-Oriented T |    26.99 |            1.08 |
+|     1310 |    1774 | Ever Since Darwin    |    14.67 |            0.59 |
+|     1321 |    1978 | Acoustic Communicati |   956.00 |           28.68 |
+|     1321 |    2008 | SQL Server 2005 T_Sq |  1091.80 |           43.67 |
+|     1328 |    1182 | MySQL Cookbook       |  3149.30 |           62.99 |
+|     1345 |    1105 | SQL:1999 Relational  |  2206.00 |           88.24 |
+|     1346 |    1619 | The Oject-Oriented T |  2699.00 |           53.98 |
+|     1346 |    1401 | Visual Studio Tools  | 10008.00 |          200.16 |
+|     1346 |    1108 | Database Systems     | 16560.00 |          662.40 |
+|     1347 |    1619 | The Oject-Oriented T |    70.00 |            1.40 |
+|     1347 |    1948 | Framework Design Gui |    40.94 |            0.41 |
+|     1347 |    1128 | Temporal Data and th |    46.20 |            1.85 |
+|     1347 |    1258 | .Net Development for |    44.99 |            0.45 |
+|     1347 |    1162 | Trees and Hierarchie |    35.00 |            0.70 |
+|     1410 |    2006 | T_SQL Programming (I |   700.00 |           14.00 |
+|     1411 |    1128 | Temporal Data and th |  1250.00 |           37.50 |
+|     1420 |    1109 | Intro to DB Systems- |   750.00 |            7.50 |
+|     1420 |    1161 | SQL Programming Styl |  1050.00 |           21.00 |
+|     1442 |    1128 | Temporal Data and th |   312.50 |            3.12 |
+|     1442 |    2008 | SQL Server 2005 T_Sq |  1398.00 |           27.96 |
+|     1442 |    2007 | T_SQL Querying (Insi |   875.00 |            8.75 |
+|     1483 |    1161 | SQL Programming Styl |   105.00 |            1.05 |
+|     1483 |    1162 | Trees and Hierarchie |    32.45 |            0.97 |
+|     1491 |    1128 | Temporal Data and th |    49.95 |            2.00 |
+|     1491 |    1161 | SQL Programming Styl |    35.00 |            0.35 |
+|     1491 |    2001 | Programming SQL Serv |    39.00 |            0.39 |
+|     1552 |    1102 | Practical Standards  |    99.98 |            4.00 |
+|     1553 |    1103 | Selected Poems       |  2400.00 |           96.00 |
+|     1553 |    1104 | Sibley Guide to Bird |  4500.00 |          135.00 |
+|     1555 |    1162 | Trees and Hierarchie |    70.00 |            0.70 |
+|     1555 |    1101 | Programming SQL Serv |   299.95 |           12.00 |
+|     1555 |    1142 | Relational Database  |   195.00 |            5.85 |
+|     1561 |    2001 | Programming SQL Serv |    39.00 |            0.78 |
+|     1561 |    1142 | Relational Database  |    34.95 |            0.35 |
+|     1561 |    1128 | Temporal Data and th |   234.75 |            4.70 |
+|     1562 |    2007 | T_SQL Querying (Insi |    39.00 |            1.17 |
+|     1562 |    2009 | SQL Server 2005 Expr |   174.75 |            5.24 |
+|     1562 |    2008 | SQL Server 2005 T_Sq |    46.95 |            1.88 |
+|     1562 |    2001 | Programming SQL Serv |    39.00 |            0.78 |
+|     1563 |    1103 | Selected Poems       |    21.90 |            0.88 |
+|     1563 |    1106 | SQL for Smarties     |    29.00 |            0.29 |
+|     1564 |    1107 | SQL Puzzles and Answ |  1047.50 |           31.42 |
+|     1564 |    1106 | SQL for Smarties     |  1747.50 |           52.42 |
+|     1564 |    2001 | Programming SQL Serv |  1950.00 |           58.50 |
+|     1601 |    1107 | SQL Puzzles and Answ |    22.50 |            0.90 |
+|     1601 |    1448 | Backyard Birdsong Gu |   134.95 |            2.70 |
+|     1601 |    1689 | Programming Visual B |   551.90 |           22.08 |
+|     1601 |    1483 | Programming with XML |    90.95 |            3.64 |
+|     1602 |    1106 | SQL for Smarties     |    29.00 |            0.87 |
+|     1602 |    1103 | Selected Poems       |    21.90 |            0.88 |
+|     1603 |    2001 | Programming SQL Serv |    39.00 |            1.17 |
+|     1603 |    2007 | T_SQL Querying (Insi |    39.00 |            0.78 |
+|     1603 |    2009 | SQL Server 2005 Expr |   174.75 |            6.99 |
+|     1604 |    1103 | Selected Poems       |   273.75 |            5.48 |
+|     1604 |    1106 | SQL for Smarties     |   435.00 |           13.05 |
+|     1605 |    1101 | Programming SQL Serv |   279.75 |           11.19 |
+|     1605 |    1103 | Selected Poems       |    50.00 |            1.00 |
+|     1605 |    2001 | Programming SQL Serv |   195.00 |            7.80 |
+|     1605 |    2007 | T_SQL Querying (Insi |    39.00 |            0.39 |
+|     1605 |    2008 | SQL Server 2005 T_Sq |    39.00 |            1.17 |
+|     1605 |    1106 | SQL for Smarties     |   174.75 |            1.75 |
+|     1605 |    2009 | SQL Server 2005 Expr |   174.75 |            3.50 |
+|     1605 |    1107 | SQL Puzzles and Answ |   104.75 |            4.19 |
+|     1606 |    1106 | SQL for Smarties     |   174.75 |            1.75 |
+|     1606 |    1107 | SQL Puzzles and Answ |   104.75 |            2.10 |
+|     1606 |    2001 | Programming SQL Serv |   195.00 |            3.90 |
+|     1610 |    1103 | Selected Poems       |    24.00 |            0.72 |
+|     1615 |    1103 | Selected Poems       |    24.00 |            0.96 |
+|     1702 |    1110 | Adv SQL:1999 Object_ |   100.00 |            1.00 |
+|     1705 |    1128 | Temporal Data and th | 16560.00 |          496.80 |
+|     1705 |    1776 | Doing Objects in Vis |  4499.00 |          179.96 |
+|     1710 |    1776 | Doing Objects in Vis |  4503.51 |          180.14 |
+|     1712 |    1835 | Data Binding with Wi |    45.99 |            0.46 |
+|     1712 |    1162 | Trees and Hierarchie |  2970.00 |           59.40 |
+|     1800 |    2008 | SQL Server 2005 T_Sq |    46.95 |            1.41 |
+|     1800 |    2009 | SQL Server 2005 Expr |   174.75 |            1.75 |
+|     1801 |    1103 | Selected Poems       |    21.90 |            0.88 |
+|     1801 |    1106 | SQL for Smarties     |    29.00 |            0.87 |
+|     1811 |    2007 | T_SQL Querying (Insi |    40.49 |            0.40 |
+|     1811 |    1357 | Why Birds Sing       |    46.80 |            0.94 |
+|     1811 |    1537 | The BedSide Book of  |    84.57 |            3.38 |
+|     1812 |    2009 | SQL Server 2005 Expr |    26.99 |            0.54 |
+|     1814 |    1258 | .Net Development for |    45.99 |            0.46 |
+|     1818 |    1180 | MySQL Database Desig |    46.99 |            0.94 |
+|     1818 |    1979 | Pro VB 2008 and the  |    53.99 |            1.62 |
+|     1818 |    1106 | SQL for Smarties     |   600.00 |           12.00 |
+|     1818 |    1537 | The BedSide Book of  |    50.00 |            1.00 |
+|     2001 |    1448 | Backyard Birdsong Gu |  1250.00 |           37.50 |
+|     2002 |    1103 | Selected Poems       |   219.00 |            2.19 |
+|     2003 |    1103 | Selected Poems       |    24.00 |            0.24 |
+|     2004 |    1161 | SQL Programming Styl |    35.00 |            0.35 |
+|     2005 |    1448 | Backyard Birdsong Gu |  1250.00 |           37.50 |
+|     2012 |    1448 | Backyard Birdsong Gu |  1250.00 |           37.50 |
+|     2013 |    2009 | SQL Server 2005 Expr |    25.00 |            0.50 |
+|     4002 |    1106 | SQL for Smarties     |   306.00 |            9.18 |
+|     4002 |    1107 | SQL Puzzles and Answ |   275.00 |            5.50 |
+|     4003 |    1104 | Sibley Guide to Bird |   225.00 |            6.75 |
+|     4007 |    1448 | Backyard Birdsong Gu |  1250.00 |           25.00 |
+|     5261 |    2001 | Programming SQL Serv |  3900.00 |           78.00 |
+|     5261 |    1128 | Temporal Data and th |  2347.50 |           23.48 |
+|     5261 |    1142 | Relational Database  |  3495.00 |           69.90 |
+|     5262 |    2009 | SQL Server 2005 Expr |   174.75 |            5.24 |
+|     5262 |    2001 | Programming SQL Serv |    39.00 |            0.78 |
+|     5321 |    1978 | Acoustic Communicati |   956.00 |           19.12 |
+|     5321 |    2008 | SQL Server 2005 T_Sq |  1091.80 |           43.67 |
+|     5328 |    1182 | MySQL Cookbook       |  3149.30 |           94.48 |
+|     5345 |    1105 | SQL:1999 Relational  |  2206.00 |           22.06 |
+|     5483 |    1161 | SQL Programming Styl |   105.00 |            1.05 |
+|     5483 |    1162 | Trees and Hierarchie |    32.45 |            0.97 |
+|     5491 |    1161 | SQL Programming Styl |    35.00 |            1.40 |
+|     5491 |    1128 | Temporal Data and th |    49.95 |            1.50 |
+|     5491 |    2001 | Programming SQL Serv |    39.00 |            0.39 |
+|     5552 |    1102 | Practical Standards  |    99.98 |            2.00 |
+|     5555 |    1142 | Relational Database  |   195.00 |            3.90 |
+|     5555 |    1101 | Programming SQL Serv |   299.95 |            6.00 |
+|     5555 |    1162 | Trees and Hierarchie |    70.00 |            2.80 |
+|     5561 |    1128 | Temporal Data and th |   234.75 |            4.70 |
+|     5561 |    2001 | Programming SQL Serv |    39.00 |            1.56 |
+|     5561 |    1142 | Relational Database  |    34.95 |            1.40 |
+|     5562 |    2007 | T_SQL Querying (Insi |    39.00 |            0.78 |
+|     5562 |    2001 | Programming SQL Serv |    39.00 |            0.78 |
+|     5562 |    2009 | SQL Server 2005 Expr |   174.75 |            3.50 |
+|     5562 |    2008 | SQL Server 2005 T_Sq |    46.95 |            1.88 |
+|    10812 |    1128 | Temporal Data and th |    49.95 |            1.50 |
+|    14873 |    1161 | SQL Programming Styl |   105.00 |            3.15 |
+|    14873 |    1162 | Trees and Hierarchie |    32.45 |            0.32 |
+|    18142 |    1279 | Data-Driven Services |    26.99 |            1.08 |
+|    18144 |    1304 | Stories of Discoveri |    45.99 |            0.92 |
+|    22774 |    1304 | Stories of Discoveri |  2250.00 |           90.00 |
+|    22774 |    1305 | Journeys Through Fla |   499.50 |            9.99 |
+|    22803 |    1301 | ADO and Oracle Workb |   682.50 |            6.83 |
+|    22803 |    1304 | Stories of Discoveri |   299.95 |            9.00 |
+|    22803 |    1128 | Temporal Data and th |  1125.00 |           22.50 |
+|    22804 |    1304 | Stories of Discoveri |  2250.00 |           45.00 |
+|    22804 |    1305 | Journeys Through Fla |   499.50 |           14.98 |
+|    22805 |    1104 | Sibley Guide to Bird |   225.00 |            4.50 |
+|    22805 |    1306 | Myths of SQL         |  1250.60 |           50.02 |
+|    22806 |    1107 | SQL Puzzles and Answ |    25.00 |            0.75 |
+|    22807 |    1175 | MySQL in a Nutshell  |    34.99 |            1.05 |
+|    22808 |    1182 | MySQL Cookbook       |    45.00 |            0.90 |
+|    22809 |    1104 | Sibley Guide to Bird |   225.00 |            4.50 |
+|    22810 |    1678 | Pro .NET 2.0 Windows |   249.95 |           10.00 |
+|    22810 |    1162 | Trees and Hierarchie |   175.00 |            1.75 |
+|    22811 |    1478 | Beginning OO Program |   225.00 |            2.25 |
+|    22812 |    1425 | The Singing Life of  |  1404.50 |           14.04 |
+|    22812 |    1357 | Why Birds Sing       |  1300.00 |           39.00 |
+|    22813 |    1175 | MySQL in a Nutshell  |    45.00 |            0.90 |
+|    22813 |    1184 | MySQL Developer's Li |    49.99 |            2.00 |
+|    22813 |    1425 | The Singing Life of  |    25.90 |            0.26 |
+|    22813 |    1175 | MySQL in a Nutshell  |    34.90 |            1.40 |
+|    22813 |    1180 | MySQL Database Desig |    49.99 |            2.00 |
+|    22813 |    1185 | MySQL Stored Procedu |    49.99 |            2.00 |
+|    22813 |    1877 | High Performance MyS |    45.00 |            1.80 |
+|    22813 |    1182 | MySQL Cookbook       |    45.00 |            0.45 |
+|    22813 |    1188 | SQL for MySQL Develo |    49.99 |            1.00 |
+|    23890 |    1103 | Selected Poems       |   165.00 |            6.60 |
+|    24345 |    1306 | Myths of SQL         |  1250.60 |           37.52 |
+|    24345 |    1104 | Sibley Guide to Bird |   225.00 |            4.50 |
+|    24802 |    1103 | Selected Poems       |    45.00 |            0.45 |
+|    24802 |    1306 | Myths of SQL         |  1250.60 |           37.52 |
+|    25803 |    1128 | Temporal Data and th |  1125.00 |           11.25 |
+|    25803 |    1304 | Stories of Discoveri |   299.95 |            3.00 |
+|    25803 |    1301 | ADO and Oracle Workb |   682.50 |           27.30 |
+|    30814 |    1103 | Selected Poems       |   276.00 |           11.04 |
+|    30815 |    1448 | Backyard Birdsong Gu |  3875.00 |          155.00 |
+|    30816 |    1448 | Backyard Birdsong Gu |  1250.00 |           37.50 |
+|    30820 |    1448 | Backyard Birdsong Gu |  1250.00 |           25.00 |
+|    30821 |    1103 | Selected Poems       |    21.90 |            0.22 |
+|    30822 |    1128 | Temporal Data and th |   499.50 |           14.98 |
+|    30824 |    1670 | Applied .NET Framewo |   400.00 |           12.00 |
+|    30824 |    2005 | Developer's Guide to |   900.00 |           27.00 |
+|    30825 |    1776 | Doing Objects in Vis |   181.96 |            5.46 |
+|    30826 |    1161 | SQL Programming Styl |   560.00 |           16.80 |
+|    30833 |    1448 | Backyard Birdsong Gu |  1250.00 |           25.00 |
+|    30834 |    1128 | Temporal Data and th |    49.95 |            1.50 |
+|    30835 |    1103 | Selected Poems       |   273.75 |           10.95 |
+|    30836 |    2008 | SQL Server 2005 T_Sq |    25.00 |            1.00 |
+|    30847 |    1103 | Selected Poems       |    24.00 |            0.24 |
+|    30848 |    2007 | T_SQL Querying (Insi |    25.00 |            0.75 |
+|    30849 |    1448 | Backyard Birdsong Gu |  1250.00 |           37.50 |
+|    31455 |    1279 | Data-Driven Services |    40.49 |            1.62 |
+|    31560 |    1279 | Data-Driven Services |    40.49 |            0.81 |
+|    31840 |    1103 | Selected Poems       |    24.00 |            0.48 |
+|    31841 |    1448 | Backyard Birdsong Gu |  1250.00 |           37.50 |
+|    31850 |    1279 | Data-Driven Services |    40.49 |            0.40 |
+|    31852 |    1279 | Data-Driven Services |    40.49 |            0.40 |
+|    31853 |    1448 | Backyard Birdsong Gu |   300.00 |            6.00 |
+|    31853 |    1162 | Trees and Hierarchie |   699.00 |           27.96 |
+|    31855 |    1279 | Data-Driven Services |    40.49 |            0.40 |
+|    31860 |    1279 | Data-Driven Services |    40.49 |            1.21 |
+|    31871 |    1448 | Backyard Birdsong Gu |    30.00 |            0.90 |
+|    31871 |    1162 | Trees and Hierarchie |    69.90 |            1.40 |
+|    31872 |    1448 | Backyard Birdsong Gu |  3000.00 |           90.00 |
+|    31884 |    1199 | SQL is Fun           |   161.91 |            4.86 |
+|    31884 |    1278 | Beginning VB 2008 Da |    48.00 |            1.92 |
+|    31885 |    1448 | Backyard Birdsong Gu |  1250.00 |           12.50 |
+|    31889 |    1109 | Intro to DB Systems- |   910.80 |           36.43 |
+|    32800 |    1128 | Temporal Data and th |  1250.00 |           25.00 |
+|    32890 |    1103 | Selected Poems       |   165.00 |            6.60 |
+|    32891 |    1142 | Relational Database  |    75.00 |            1.50 |
+|    32892 |    2002 | SQL Server 2005 A Be |    75.00 |            1.50 |
+|    32893 |    1689 | Programming Visual B |    55.19 |            0.55 |
+|    32894 |    1894 | Programming Visual B |    35.99 |            1.44 |
+|    32895 |    1689 | Programming Visual B |    55.19 |            2.21 |
+|    32896 |    1894 | Programming Visual B |    35.99 |            1.44 |
+|    32897 |    1110 | Adv SQL:1999 Object_ |   100.00 |            1.00 |
+|    32898 |    2006 | T_SQL Programming (I |    60.00 |            2.40 |
+|    32899 |    1128 | Temporal Data and th |  1250.00 |           50.00 |
+|    32900 |    1305 | Journeys Through Fla |   625.00 |            6.25 |
+|    32900 |    1401 | Visual Studio Tools  |  1000.00 |           40.00 |
+|    32901 |    1401 | Visual Studio Tools  |  2450.00 |           24.50 |
+|    32902 |    1401 | Visual Studio Tools  |  6500.00 |          260.00 |
+|    32902 |    1305 | Journeys Through Fla |   294.00 |            5.88 |
+|    32903 |    1401 | Visual Studio Tools  |    58.00 |            1.16 |
+|    32904 |    1305 | Journeys Through Fla |  2335.50 |           93.42 |
+|    32904 |    1448 | Backyard Birdsong Gu |   118.76 |            2.38 |
+|    32905 |    2028 | Mastering Oracle Dat |    58.00 |            2.32 |
+|    32906 |    1103 | Selected Poems       |   165.00 |            3.30 |
+|    32906 |    2028 | Mastering Oracle Dat |   117.00 |            3.51 |
+|    32906 |    1103 | Selected Poems       |     5.75 |            0.17 |
+|    32907 |    1142 | Relational Database  |   111.40 |            4.46 |
+|    32907 |    2028 | Mastering Oracle Dat |   174.00 |            5.22 |
+|    33001 |    1109 | Intro to DB Systems- |    75.00 |            3.00 |
+|    33001 |    1161 | SQL Programming Styl |   105.00 |            3.15 |
+|    33002 |    1258 | .Net Development for |    44.99 |            1.80 |
+|    33002 |    1162 | Trees and Hierarchie |    35.00 |            0.35 |
+|    33002 |    1619 | The Oject-Oriented T |    70.00 |            2.80 |
+|    33002 |    1948 | Framework Design Gui |    40.94 |            0.41 |
+|    33002 |    1128 | Temporal Data and th |    46.20 |            0.92 |
+|    33005 |    1628 | The Superorganism:Th |    32.00 |            1.28 |
+|    33005 |    1629 | The Leafcutter Ants: |    19.95 |            0.80 |
+|    33006 |    1628 | The Superorganism:Th |    32.00 |            1.28 |
+|    33006 |    1629 | The Leafcutter Ants: |    19.95 |            0.60 |
+|    33007 |    1619 | The Oject-Oriented T |    70.00 |            2.10 |
+|    33007 |    1128 | Temporal Data and th |    46.20 |            1.39 |
+|    33007 |    1258 | .Net Development for |    44.99 |            1.80 |
+|    33008 |    1448 | Backyard Birdsong Gu |   125.00 |            5.00 |
+|    33008 |    1628 | The Superorganism:Th |    64.00 |            2.56 |
+|    33009 |    1142 | Relational Database  |   195.00 |            7.80 |
+|    33013 |    1305 | Journeys Through Fla |   294.00 |            2.94 |
+|    33013 |    1401 | Visual Studio Tools  |  6500.00 |          130.00 |
+|    33014 |    1628 | The Superorganism:Th |   320.00 |            3.20 |
+|    33014 |    1629 | The Leafcutter Ants: |   199.50 |            3.99 |
+|    33017 |    1625 | Winter Weed Finder:  |     4.00 |            0.16 |
+|    33022 |    1627 | The Ants             |   199.95 |            4.00 |
+|    33023 |    1978 | Acoustic Communicati |   460.00 |           18.40 |
+|    33034 |    1619 | The Oject-Oriented T |    29.99 |            0.90 |
+|    33034 |    1619 | The Oject-Oriented T |    31.90 |            0.64 |
+|    33035 |    1142 | Relational Database  |   180.00 |            1.80 |
+|    33040 |    1626 | Bark: A Field Guide  |    19.95 |            0.20 |
+|    33040 |    1162 | Trees and Hierarchie |    32.00 |            0.96 |
+|    40814 |    1103 | Selected Poems       |   276.00 |           11.04 |
+|    40836 |    2008 | SQL Server 2005 T_Sq |    25.00 |            0.75 |
+|    41224 |    1101 | Programming SQL Serv |   441.52 |           13.25 |
+|    41811 |    2007 | T_SQL Querying (Insi |    40.49 |            0.81 |
+|    41811 |    1537 | The BedSide Book of  |    84.57 |            1.69 |
+|    41811 |    1357 | Why Birds Sing       |    46.80 |            1.87 |
+|    41812 |    2009 | SQL Server 2005 Expr |    26.99 |            0.27 |
+|    41814 |    1258 | .Net Development for |    45.99 |            1.38 |
+|    41840 |    1103 | Selected Poems       |    24.00 |            0.24 |
+|    41841 |    1448 | Backyard Birdsong Gu |  1250.00 |           25.00 |
+|    41850 |    1279 | Data-Driven Services |    40.49 |            1.21 |
+|    41852 |    1279 | Data-Driven Services |    40.49 |            1.62 |
+|    41853 |    1162 | Trees and Hierarchie |   699.00 |            6.99 |
+|    41853 |    1448 | Backyard Birdsong Gu |   300.00 |            6.00 |
+|    42331 |    1142 | Relational Database  |    75.00 |            3.00 |
+|    42891 |    1142 | Relational Database  |    15.00 |            0.30 |
+|    52900 |    1401 | Visual Studio Tools  |  1000.00 |           40.00 |
+|    52900 |    1305 | Journeys Through Fla |   625.00 |            6.25 |
+|    52901 |    1401 | Visual Studio Tools  |  2450.00 |           24.50 |
+|    52905 |    2028 | Mastering Oracle Dat |    58.00 |            2.32 |
+|    52906 |    1103 | Selected Poems       |     5.75 |            0.17 |
+|    52906 |    2028 | Mastering Oracle Dat |   117.00 |            2.34 |
+|    52906 |    1103 | Selected Poems       |   165.00 |            3.30 |
+|    54883 |    1162 | Trees and Hierarchie |    32.45 |            0.65 |
+|    54883 |    1161 | SQL Programming Styl |   105.00 |            2.10 |
++----------+---------+----------------------+----------+-----------------+
+329 rows in set (0.00 sec)
+
+Bye

@@ -1,0 +1,257 @@
+--------------
+-- Zorigt Bazarragchaa
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+ /* enable warnings! */
+
+use a_vets
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+/* TASK 00 */
+select user(), current_date(), version(), @@sql_mode
+--------------
+
+*************************** 1. row ***************************
+        user(): zorigt@localhost
+current_date(): 2013-06-16
+     version(): 5.6.12
+    @@sql_mode: STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+1 row in set (0.00 sec)
+
+--------------
+/* TASK 01 */
+select
+	concat(stf_name_first, ' ', stf_name_last) as stf_name
+, 	stf_job_title
+from a_vets.vt_staff
+order by stf_name_last, stf_name_first
+--------------
+
++---------------------+---------------+
+| stf_name            | stf_job_title |
++---------------------+---------------+
+| Eliza Dolittle      | vet           |
+| Dexter Gordon       | vet assnt     |
+| Pat Halvers         | kennel        |
+| Sandy Helfen        | vet assnt     |
+| Sandy Helfen        | vet assnt     |
+| Shirley Horn        | clerical      |
+| Rhoda Wabich        | vet           |
+| Marcin Wasilewski   | vet           |
+| Brenda Webster      | vet assnt     |
+| Bridgette Wilkommen | vet           |
++---------------------+---------------+
+10 rows in set (0.00 sec)
+
+--------------
+/* TASK 02 */
+select
+	stf_hire_date
+,	stf_salary
+,	round(stf_salary * 1.12, 2) as WithRaise
+from a_vets.vt_staff_pay
+order by stf_hire_date desc
+--------------
+
++---------------+------------+-----------+
+| stf_hire_date | stf_salary | WithRaise |
++---------------+------------+-----------+
+| 2013-01-13    |   20000.00 |  22400.00 |
+| 2013-01-13    |   20000.00 |  22400.00 |
+| 2011-08-12    |   15500.00 |  17360.00 |
+| 2011-06-01    |   65000.00 |  72800.00 |
+| 2009-09-26    |   37500.00 |  42000.00 |
+| 2008-08-12    |   20000.00 |  22400.00 |
+| 2005-08-01    |   35000.00 |  39200.00 |
+| 2005-06-01    |   40000.00 |  44800.00 |
+| 1995-01-06    |   99000.00 | 110880.00 |
++---------------+------------+-----------+
+9 rows in set (0.00 sec)
+
+--------------
+/* TASK 03 */
+select
+	an_id as ID
+, 	an_name as Name
+, 	an_type as 'Animal Type'
+, 	an_dob as 'Birth Date'
+from a_vets.vt_animals
+order by an_dob
+limit 10
+--------------
+
++-------+-----------------+-------------+------------+
+| ID    | Name            | Animal Type | Birth Date |
++-------+-----------------+-------------+------------+
+| 12035 | Mr Peanut       | bird        | 1995-02-28 |
+| 15401 | Pinkie          | lizard      | 1998-03-15 |
+| 21002 | Edger           | hedgehog    | 2002-10-02 |
+| 21003 | Calvin Coolidge | dog         | 2004-06-18 |
+| 11029 | NULL            | bird        | 2005-10-01 |
+| 15165 | Burgess         | dog         | 2005-11-20 |
+| 16003 | Ursula          | cat         | 2006-06-06 |
+| 16004 | Napper          | cat         | 2006-06-06 |
+| 15001 | Big Mike        | chelonian   | 2008-02-02 |
+| 15002 | George          | chelonian   | 2008-02-02 |
++-------+-----------------+-------------+------------+
+10 rows in set (0.00 sec)
+
+--------------
+/* TASK 04 */
+select 
+	srv_id
+,	srv_list_price
+,	srv_desc
+from a_vets.vt_services
+order by srv_list_price desc
+--------------
+
++--------+----------------+--------------------------------------------+
+| srv_id | srv_list_price | srv_desc                                   |
++--------+----------------+--------------------------------------------+
+|    605 |         535.00 | Tooth extraction Level 1                   |
+|   4601 |         275.00 | Feline Behaviour Modification Consultation |
+|    602 |         222.00 | General Anethesia 1 hour                   |
+|    625 |         155.00 | CBC and scan                               |
+|    604 |         109.00 | Dental Scaling                             |
+|    110 |         100.00 | Dental Cleaning-Other                      |
+|    105 |          80.00 | Routine Exam-Canine                        |
+|    108 |          80.00 | Routine Exam-Feline                        |
+|    615 |          78.30 | antibiotics                                |
+|    603 |          78.00 | Feline Dental X_ray                        |
+|    225 |          75.00 | Feline PCR Series                          |
+|    106 |          75.00 | Routine Exam-Bird                          |
+|    523 |          60.00 | Routine Exam-Small Mammal                  |
+|    104 |          60.00 | Routine Exam-Reptile                       |
+|    607 |          57.00 | Tooth extraction Level 3                   |
+|    101 |          50.00 | Dental Cleaning-Canine                     |
+|    613 |          47.00 | Hospital stay- short                       |
+|    102 |          45.00 | Dental Cleaning-Feline                     |
+|    308 |          45.00 | Followup Exam-Feline                       |
+|    687 |          45.00 | Vitamin E- Concentrated                    |
+|    606 |          40.00 | Tooth extraction Level 2                   |
+|    551 |          35.50 | First Feline PCR                           |
+|    398 |          35.00 | Followup Exam-Canine                       |
+|    306 |          32.00 | Followup Exam-Bird                         |
+|    749 |          29.50 | Preds-chicken                              |
+|    748 |          29.50 | Preds-liver                                |
+|   1003 |          26.00 | Intestinal Parasite Screen                 |
+|    612 |          25.91 | Buprenex oral drops 1 ml                   |
+|   1002 |          25.00 | Scaly Mite Powder                          |
+|    552 |          25.00 | Second Feline PCR                          |
+|    341 |          25.00 | Followup Exam-Reptile                      |
+|    524 |          25.00 | Followup Exam-Small Mammal                 |
+|    553 |          25.00 | Third Feline PCR                           |
+|    400 |          10.50 | Hazardous Materials Disposal               |
++--------+----------------+--------------------------------------------+
+34 rows in set (0.00 sec)
+
+--------------
+/* TASK 05 */
+select
+	ex_id as Exam_ID
+,	ex_fee as Fee_Charged
+,	round(ex_fee * 0.095, 2) as Tax_Charged
+,	round(ex_fee * 0.095, 2) + ex_fee as Total_Due
+from a_vets.vt_exam_details
+order by ex_id, ex_fee
+limit 10
+--------------
+
++---------+-------------+-------------+-----------+
+| Exam_ID | Fee_Charged | Tax_Charged | Total_Due |
++---------+-------------+-------------+-----------+
+|    1996 |       29.50 |        2.80 |     32.30 |
+|    1997 |        0.00 |        0.00 |      0.00 |
+|    1998 |       25.00 |        2.38 |     27.38 |
+|    1998 |       30.00 |        2.85 |     32.85 |
+|    1998 |       45.00 |        4.28 |     49.28 |
+|    1999 |       20.00 |        1.90 |     21.90 |
+|    2007 |       25.00 |        2.38 |     27.38 |
+|    3001 |       25.00 |        2.38 |     27.38 |
+|    3010 |       25.00 |        2.38 |     27.38 |
+|    3101 |       60.00 |        5.70 |     65.70 |
++---------+-------------+-------------+-----------+
+10 rows in set (0.00 sec)
+
+--------------
+/* TASK 06 */
+select
+	an_id
+,	ex_date
+,	stf_id
+from a_vets.vt_exam_headers
+order by stf_id, ex_date
+--------------
+
++-------+---------------------+--------+
+| an_id | ex_date             | stf_id |
++-------+---------------------+--------+
+| 15002 | 2013-01-02 13:00:00 |     15 |
+| 15001 | 2013-01-02 13:00:00 |     15 |
+| 21001 | 2013-02-23 10:30:00 |     15 |
+| 17027 | 2013-03-06 10:30:00 |     15 |
+| 19845 | 2013-03-22 09:00:00 |     15 |
+| 21003 | 2013-03-26 09:30:00 |     15 |
+| 21005 | 2013-03-31 13:00:00 |     15 |
+| 16003 | 2013-04-01 16:30:00 |     15 |
+| 16003 | 2013-05-01 16:30:00 |     15 |
+| 16003 | 2013-05-23 08:30:00 |     15 |
+| 15401 | 2013-06-06 10:30:00 |     15 |
+| 16003 | 2013-06-10 10:30:00 |     15 |
+| 15001 | 2013-02-09 09:00:00 |     25 |
+| 15001 | 2013-04-22 09:00:00 |     25 |
+| 16002 | 2012-11-06 10:45:00 |     29 |
+| 17025 | 2012-11-07 10:45:00 |     29 |
+| 16002 | 2012-11-16 09:15:00 |     29 |
+| 16002 | 2012-12-03 14:30:00 |     29 |
+| 17026 | 2012-12-22 10:45:00 |     29 |
+| 17027 | 2012-12-24 10:45:00 |     29 |
+| 16002 | 2013-02-03 14:30:00 |     29 |
+| 17025 | 2013-02-03 14:30:00 |     29 |
+| 17025 | 2013-03-06 10:45:00 |     29 |
+| 17026 | 2013-03-21 10:45:00 |     29 |
+| 16002 | 2013-03-23 12:15:00 |     29 |
+| 17027 | 2013-03-27 10:45:00 |     29 |
+| 17025 | 2013-04-29 14:30:00 |     29 |
+| 17025 | 2013-04-30 14:30:00 |     29 |
+| 15002 | 2013-06-10 10:45:00 |     29 |
+| 16002 | 2013-01-02 15:30:00 |     38 |
+| 12035 | 2013-01-02 16:30:00 |     38 |
++-------+---------------------+--------+
+31 rows in set (0.00 sec)
+
+--------------
+/* TASK 07 */
+select distinct
+	cl_state
+,	cl_city
+from a_vets.vt_clients
+order by cl_state, cl_city
+--------------
+
++----------+---------------+
+| cl_state | cl_city       |
++----------+---------------+
+| AR       | Big Rock      |
+| CA       | San Diego     |
+| CA       | San Francisco |
+| IL       | Springfield   |
+| MA       | Boston        |
+| MA       | Spring Valley |
+| MO       | Springfield   |
+| ND       | Big Rock      |
+| NM       | San Francisco |
+| NY       | New York      |
+| OH       | Dayton        |
+| OH       | Springfield   |
++----------+---------------+
+12 rows in set (0.00 sec)
+
+Bye

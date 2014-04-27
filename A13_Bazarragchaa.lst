@@ -1,0 +1,460 @@
+--------------
+-- Zorigt Bazarragchaa
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+ /* enable warnings! */
+
+use a_xml
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+/* TASK 00 */
+select user(), current_date(), version(), @@sql_mode
+--------------
+
+*************************** 1. row ***************************
+        user(): zorigt@localhost
+current_date(): 2013-07-26
+     version(): 5.6.12
+    @@sql_mode: STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+1 row in set (0.00 sec)
+
+--------------
+/* TASK 01 */
+
+insert into a_xml.xml_animals values (10,
+'<client cl_id="0010"><cl_name>Faith</cl_name><pets><animal><an_id>110</an_id><an_type>Dinosaur</an_type><an_name>Prehisotric</an_name><an_price>1010</an_price></animal></pets></client>
+')
+--------------
+
+--------------
+ 
+insert into a_xml.xml_animals values (11,
+'
+<client cl_id="0011"><cl_name>Hope</cl_name><pets><animal><an_id>111</an_id><an_type>Elephant</an_type><an_name>Humongus</an_name><an_price>1011</an_price></animal></pets></client>
+')
+--------------
+
+--------------
+insert into a_xml.xml_animals values (12,
+'
+<client cl_id="0012"><cl_name>Joy</cl_name><pets><animal><an_id>112</an_id><an_type>snake</an_type><an_name>Black Momba</an_name><an_price>1012</an_price></animal></pets></client>
+')
+--------------
+
+--------------
+insert into a_xml.xml_animals values (13,
+'
+<client cl_id="0013"><cl_name>Peace</cl_name><pets><animal><an_id>113</an_id><an_type>Hippo</an_type><an_name>Oversized</an_name><an_price>1013</an_price></animal></pets></client>
+')
+--------------
+
+--------------
+insert into a_xml.xml_animals values (14,
+'
+<client cl_id="0014"><cl_name>War</cl_name><pets><animal><an_id>114</an_id><an_type>Dragon</an_type><an_name>Dangerous</an_name><an_price>1014</an_price></animal></pets></client>
+')
+--------------
+
+--------------
+select 
+	id
+,	extractValue(datax, '/client/cl_name') as Client
+,	extractValue(datax, '/client/pets/animal/an_type') as TypeOfAnimal
+,	extractValue(datax, '/client/pets/animal/an_name') as AnimalName
+,	extractValue(datax, '/client/pets/animal/an_price') as AnimalPrice
+from a_xml.xml_animals
+--------------
+
++----+---------+---------------------------+-------------------------------------------------------------+-----------------------+
+| id | Client  | TypeOfAnimal              | AnimalName                                                  | AnimalPrice           |
++----+---------+---------------------------+-------------------------------------------------------------+-----------------------+
+|  1 | Johnson | bird                      | Mr. Peanut                                                  | 250                   |
+|  2 | Nelson  | cat bird bird             | Ursula Snookums Mittens ShowBoat catkins                    | 500 75 175            |
+|  3 | Miller  |                           |                                                             |                       |
+|  4 | Miller  | bird bird bird bird       | ShowBoat Mr. Peanut Tweet Charlie                           | 75 150 275 380        |
+|  5 | Leeson  | bird cat dog              | Archibald Smithers Smuthers Bossun                          | 275 250 250           |
+|  6 | Terry   | bird bird bird            | Archibald Smithers1 Smuthers2 cat                           | 275 250 250           |
+|  7 | Clyde   | bird cat dog bird cat dog | Archibald Smithers Smuthers Bossun Archibald Smithers Betty | 275 250 250 275 12 45 |
+| 10 | Faith   | Dinosaur                  | Prehisotric                                                 | 1010                  |
+| 11 | Hope    | Elephant                  | Humongus                                                    | 1011                  |
+| 12 | Joy     | snake                     | Black Momba                                                 | 1012                  |
+| 13 | Peace   | Hippo                     | Oversized                                                   | 1013                  |
+| 14 | War     | Dragon                    | Dangerous                                                   | 1014                  |
++----+---------+---------------------------+-------------------------------------------------------------+-----------------------+
+12 rows in set (0.00 sec)
+
+--------------
+/* TASK 02 */
+select 
+	id
+,	extractValue(datax, '/client/cl_name') as Client
+,	extractValue(datax, '/client/@cl_id') as ClientID
+from a_xml.xml_animals
+where  extractValue(datax, '/client/pets/animal/an_type') like 'cat %'
+or extractValue(datax, '/client/pets/animal/an_type') like '% cat %'
+or extractValue(datax, '/client/pets/animal/an_type') like '% cat'
+--------------
+
++----+--------+----------+
+| id | Client | ClientID |
++----+--------+----------+
+|  2 | Nelson | 3908     |
+|  5 | Leeson | 4578     |
+|  7 | Clyde  | 4478     |
++----+--------+----------+
+3 rows in set (0.00 sec)
+
+--------------
+/* TASK 03 */
+select 
+	id
+,	extractValue(datax, '/client/cl_name') as Client
+,	extractValue(datax, '/client/@cl_id') as ClientID
+from a_xml.xml_animals
+where extractValue(datax, 'count(/client/pets/animal[an_type = "cat"])') > 0
+--------------
+
++----+--------+----------+
+| id | Client | ClientID |
++----+--------+----------+
+|  2 | Nelson | 3908     |
+|  5 | Leeson | 4578     |
+|  7 | Clyde  | 4478     |
++----+--------+----------+
+3 rows in set (0.00 sec)
+
+--------------
+/* TASK 04 */
+select 
+	id
+,	extractValue(datax, '/client/cl_name') as Client
+,	extractValue(datax, '/client/@cl_id') as ClientID
+from a_xml.xml_animals
+where extractValue(datax, 'count(/client/pets/animal[an_price = 250 and an_type = "bird"])') > 0
+--------------
+
++----+---------+----------+
+| id | Client  | ClientID |
++----+---------+----------+
+|  1 | Johnson | 8243     |
+|  6 | Terry   | 9478     |
++----+---------+----------+
+2 rows in set (0.00 sec)
+
+--------------
+/* TASK 05 */
+select 
+	id
+,	extractValue(datax, '/client/cl_name') as Client
+,	extractValue(datax, '/client/@cl_id') as ClientID
+,	concat(extractValue(datax, '/client/pets/animal[1]/an_type'), ' named ', extractValue(datax, '/client/pets/animal[1]/an_name')) as Animal_First
+from a_xml.xml_animals
+--------------
+
++----+---------+----------+-----------------------------------+
+| id | Client  | ClientID | Animal_First                      |
++----+---------+----------+-----------------------------------+
+|  1 | Johnson | 8243     | bird named Mr. Peanut             |
+|  2 | Nelson  | 3908     | cat named Ursula Snookums Mittens |
+|  3 | Miller  | 3775     |  named                            |
+|  4 | Miller  | 8467     | bird named ShowBoat               |
+|  5 | Leeson  | 4578     | bird named Archibald              |
+|  6 | Terry   | 9478     | bird named Archibald              |
+|  7 | Clyde   | 4478     | bird named Archibald              |
+| 10 | Faith   | 0010     | Dinosaur named Prehisotric        |
+| 11 | Hope    | 0011     | Elephant named Humongus           |
+| 12 | Joy     | 0012     | snake named Black Momba           |
+| 13 | Peace   | 0013     | Hippo named Oversized             |
+| 14 | War     | 0014     | Dragon named Dangerous            |
++----+---------+----------+-----------------------------------+
+12 rows in set (0.00 sec)
+
+--------------
+/* TASK 06 */
+select 
+	id
+,	extractValue(datax, '/client/cl_name') as Client
+,	extractValue(datax, '/client/@cl_id') as ClientID
+,	concat(extractValue(datax, '/client/pets/animal[1]/an_type'), 
+			case when extractValue(datax, 'count(/client/pets/animal[1]/an_name)') = 0
+				 then 'with no name'	
+			else ' named '
+			end, 
+			case when extractValue(datax, 'count(/client/pets/animal[1]/an_name)') = 0
+				 then ''
+			else extractValue(datax, '/client/pets/animal[1]/an_name[last()]')
+			end
+			) as Animal_First
+from a_xml.xml_animals
+--------------
+
++----+---------+----------+----------------------------+
+| id | Client  | ClientID | Animal_First               |
++----+---------+----------+----------------------------+
+|  1 | Johnson | 8243     | bird named Mr. Peanut      |
+|  2 | Nelson  | 3908     | cat named Mittens          |
+|  3 | Miller  | 3775     | with no name               |
+|  4 | Miller  | 8467     | bird named ShowBoat        |
+|  5 | Leeson  | 4578     | bird named Archibald       |
+|  6 | Terry   | 9478     | bird named Archibald       |
+|  7 | Clyde   | 4478     | bird named Archibald       |
+| 10 | Faith   | 0010     | Dinosaur named Prehisotric |
+| 11 | Hope    | 0011     | Elephant named Humongus    |
+| 12 | Joy     | 0012     | snake named Black Momba    |
+| 13 | Peace   | 0013     | Hippo named Oversized      |
+| 14 | War     | 0014     | Dragon named Dangerous     |
++----+---------+----------+----------------------------+
+12 rows in set (0.00 sec)
+
+--------------
+/* TASK 07 */
+select 
+	id
+,	extractValue(datax, '/client/cl_name') as Client
+,	extractValue(datax, '/client/@cl_id') as ClientID
+from a_xml.xml_animals
+where extractValue(datax, '/client/pets/animal[2]/an_id') <> ''
+and extractValue(datax, '/client/pets/animal[4]/an_id') = ''
+--------------
+
++----+--------+----------+
+| id | Client | ClientID |
++----+--------+----------+
+|  2 | Nelson | 3908     |
+|  5 | Leeson | 4578     |
+|  6 | Terry  | 9478     |
++----+--------+----------+
+3 rows in set (0.00 sec)
+
+--------------
+/* TASK 08 */
+select 
+	id
+,	extractValue(datax, '/client/cl_name') as Client
+,	extractValue(datax, '/client/@cl_id') as ClientID
+, 	extractValue(datax, 'count(/client/pets/animal)') as NumberOfAnimals
+from a_xml.xml_animals
+order by NumberOfAnimals desc
+--------------
+
++----+---------+----------+-----------------+
+| id | Client  | ClientID | NumberOfAnimals |
++----+---------+----------+-----------------+
+|  7 | Clyde   | 4478     | 6               |
+|  4 | Miller  | 8467     | 4               |
+|  2 | Nelson  | 3908     | 3               |
+|  5 | Leeson  | 4578     | 3               |
+|  6 | Terry   | 9478     | 3               |
+|  1 | Johnson | 8243     | 1               |
+| 10 | Faith   | 0010     | 1               |
+| 11 | Hope    | 0011     | 1               |
+| 12 | Joy     | 0012     | 1               |
+| 13 | Peace   | 0013     | 1               |
+| 14 | War     | 0014     | 1               |
+|  3 | Miller  | 3775     | 0               |
++----+---------+----------+-----------------+
+12 rows in set (0.00 sec)
+
+--------------
+/* TASK 09 */
+select 
+	extractValue(datax, '/client/@cl_id') as ClientID
+, 	extractValue(datax, '/client/descendant::*') as AllData
+from a_xml.xml_animals
+--------------
+
+*************************** 1. row ***************************
+ClientID: 8243
+ AllData: Johnson 137 bird Mr. Peanut 250
+*************************** 2. row ***************************
+ClientID: 3908
+ AllData: Nelson 1201 cat Ursula Snookums Mittens 500 136 bird ShowBoat 75 137 bird catkins 175
+*************************** 3. row ***************************
+ClientID: 3775
+ AllData: Miller
+*************************** 4. row ***************************
+ClientID: 8467
+ AllData: Miller 205 bird ShowBoat 75 207 bird Mr. Peanut 150 212 bird Tweet 275 215 bird Charlie 380
+*************************** 5. row ***************************
+ClientID: 4578
+ AllData: Leeson 358 bird Archibald 275 369 cat Smithers Smuthers 250 3478 dog Bossun 250
+*************************** 6. row ***************************
+ClientID: 9478
+ AllData: Terry 658 bird Archibald 275 669 bird Smithers1 Smuthers2 250 2478 bird cat 250
+*************************** 7. row ***************************
+ClientID: 4478
+ AllData: Clyde 101 bird Archibald 275 102 cat Smithers Smuthers 250 103 dog Bossun 250 301 bird Archibald 275 201 cat Smithers 12 401 dog Betty 45
+*************************** 8. row ***************************
+ClientID: 0010
+ AllData: Faith 110 Dinosaur Prehisotric 1010
+*************************** 9. row ***************************
+ClientID: 0011
+ AllData: Hope 111 Elephant Humongus 1011
+*************************** 10. row ***************************
+ClientID: 0012
+ AllData: Joy 112 snake Black Momba 1012
+*************************** 11. row ***************************
+ClientID: 0013
+ AllData: Peace 113 Hippo Oversized 1013
+*************************** 12. row ***************************
+ClientID: 0014
+ AllData: War 114 Dragon Dangerous 1014
+12 rows in set (0.00 sec)
+
+--------------
+/* TASK 10 */
+select 
+	extractValue(datax, '/client/cl_name') as Client
+,	extractValue(datax, '/client/@cl_id') as ClientID
+, 	case when extractValue(datax, 'count(/client/pets/animal/an_type[self:text()="bird"])') > 0
+			then extractValue(datax, '/client/pets/animal/an_type[self:text()="bird"]/../an_name[1]')
+			else ''
+			end as AnimalName
+,	case when extractValue(datax, 'count(/client/pets/animal/an_type[self:text()="bird"])') > 0
+			then extractValue(datax, '/client/pets/animal/an_type[self:text()="bird"]/../child::*')
+			else ''
+			end as AnimalData
+from a_xml.xml_animals
+--------------
+
+*************************** 1. row ***************************
+    Client: Johnson
+  ClientID: 8243
+AnimalName: Mr. Peanut
+AnimalData: 137 bird Mr. Peanut 250
+*************************** 2. row ***************************
+    Client: Nelson
+  ClientID: 3908
+AnimalName: ShowBoat catkins
+AnimalData: 136 bird ShowBoat 75 137 bird catkins 175
+*************************** 3. row ***************************
+    Client: Miller
+  ClientID: 3775
+AnimalName: 
+AnimalData: 
+*************************** 4. row ***************************
+    Client: Miller
+  ClientID: 8467
+AnimalName: ShowBoat Mr. Peanut Tweet Charlie
+AnimalData: 205 bird ShowBoat 75 207 bird Mr. Peanut 150 212 bird Tweet 275 215 bird Charlie 380
+*************************** 5. row ***************************
+    Client: Leeson
+  ClientID: 4578
+AnimalName: Archibald
+AnimalData: 358 bird Archibald 275
+*************************** 6. row ***************************
+    Client: Terry
+  ClientID: 9478
+AnimalName: Archibald Smithers1 cat
+AnimalData: 658 bird Archibald 275 669 bird Smithers1 Smuthers2 250 2478 bird cat 250
+*************************** 7. row ***************************
+    Client: Clyde
+  ClientID: 4478
+AnimalName: Archibald Archibald
+AnimalData: 101 bird Archibald 275 301 bird Archibald 275
+*************************** 8. row ***************************
+    Client: Faith
+  ClientID: 0010
+AnimalName: 
+AnimalData: 
+*************************** 9. row ***************************
+    Client: Hope
+  ClientID: 0011
+AnimalName: 
+AnimalData: 
+*************************** 10. row ***************************
+    Client: Joy
+  ClientID: 0012
+AnimalName: 
+AnimalData: 
+*************************** 11. row ***************************
+    Client: Peace
+  ClientID: 0013
+AnimalName: 
+AnimalData: 
+*************************** 12. row ***************************
+    Client: War
+  ClientID: 0014
+AnimalName: 
+AnimalData: 
+12 rows in set (0.00 sec)
+
+--------------
+/* TASK 11 */
+select 
+	extractValue(datax, '/client/cl_name') as Client
+,	extractValue(datax, '/client/@cl_id') as ClientID
+, 	extractValue(datax, '/client/pets/animal/an_type[self:text()="bird"]/../an_name[1]') as AnimalName
+,	extractValue(datax, '/client/pets/animal/an_type[self:text()="bird"]/../child::*') as AnimalData
+from a_xml.xml_animals
+--------------
+
+*************************** 1. row ***************************
+    Client: Johnson
+  ClientID: 8243
+AnimalName: Mr. Peanut
+AnimalData: 137 bird Mr. Peanut 250
+*************************** 2. row ***************************
+    Client: Nelson
+  ClientID: 3908
+AnimalName: ShowBoat catkins
+AnimalData: 136 bird ShowBoat 75 137 bird catkins 175
+*************************** 3. row ***************************
+    Client: Miller
+  ClientID: 3775
+AnimalName: 
+AnimalData: 
+*************************** 4. row ***************************
+    Client: Miller
+  ClientID: 8467
+AnimalName: ShowBoat Mr. Peanut Tweet Charlie
+AnimalData: 205 bird ShowBoat 75 207 bird Mr. Peanut 150 212 bird Tweet 275 215 bird Charlie 380
+*************************** 5. row ***************************
+    Client: Leeson
+  ClientID: 4578
+AnimalName: Archibald
+AnimalData: 358 bird Archibald 275
+*************************** 6. row ***************************
+    Client: Terry
+  ClientID: 9478
+AnimalName: Archibald Smithers1 cat
+AnimalData: 658 bird Archibald 275 669 bird Smithers1 Smuthers2 250 2478 bird cat 250
+*************************** 7. row ***************************
+    Client: Clyde
+  ClientID: 4478
+AnimalName: Archibald Archibald
+AnimalData: 101 bird Archibald 275 301 bird Archibald 275
+*************************** 8. row ***************************
+    Client: Faith
+  ClientID: 0010
+AnimalName: 
+AnimalData: 
+*************************** 9. row ***************************
+    Client: Hope
+  ClientID: 0011
+AnimalName: 
+AnimalData: 
+*************************** 10. row ***************************
+    Client: Joy
+  ClientID: 0012
+AnimalName: 
+AnimalData: 
+*************************** 11. row ***************************
+    Client: Peace
+  ClientID: 0013
+AnimalName: 
+AnimalData: 
+*************************** 12. row ***************************
+    Client: War
+  ClientID: 0014
+AnimalName: 
+AnimalData: 
+12 rows in set (0.00 sec)
+
+Bye

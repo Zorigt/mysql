@@ -1,0 +1,98 @@
+--------------
+-- Zorigt Bazarragchaa
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+show create function a_testbed.BookSize
+--------------
+
+*************************** 1. row ***************************
+            Function: BookSize
+            sql_mode: STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+     Create Function: CREATE DEFINER=`zorigt`@`localhost` FUNCTION `BookSize`(
+	in_pages int
+	) RETURNS char(13) CHARSET utf8
+begin
+	declare v_book_type char(13);
+	
+	if (in_pages is null or in_pages < 0) then
+		set v_book_type = 'Invalid Input';
+	elseif (in_pages <= 200) then
+		set v_book_type = 'Mini';
+	elseif (in_pages >= 201 and in_pages <= 500)then
+		set v_book_type = 'Small';
+	elseif (in_pages >= 501 and in_pages <= 1000)then
+		set v_book_type = 'Medium';
+	elseif (in_pages >= 1001 and in_pages <= 1500)then
+		set v_book_type = 'Large';
+	else
+		set v_book_type = 'Too Long';
+	end if;
+	
+	return v_book_type;
+end
+character_set_client: cp850
+collation_connection: cp850_general_ci
+  Database Collation: utf8_general_ci
+1 row in set (0.00 sec)
+
+--------------
+show create function a_testbed.InternalBlankCount
+--------------
+
+*************************** 1. row ***************************
+            Function: InternalBlankCount
+            sql_mode: STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+     Create Function: CREATE DEFINER=`zorigt`@`localhost` FUNCTION `InternalBlankCount`(
+	in_string char(100)
+	) RETURNS int(11)
+begin
+	declare v_new_string char(100);
+	declare v_no_blank char(100);
+	declare v_num_blanks int default 0;
+	set v_new_string = trim(in_string);
+	set v_no_blank = replace(v_new_string, ' ', '');
+	set v_num_blanks = length(v_new_string) - length(v_no_blank);
+	
+	return v_num_blanks;
+end
+character_set_client: cp850
+collation_connection: cp850_general_ci
+  Database Collation: utf8_general_ci
+1 row in set (0.00 sec)
+
+--------------
+show create function a_testbed.PrevMonth
+--------------
+
+*************************** 1. row ***************************
+            Function: PrevMonth
+            sql_mode: STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+     Create Function: CREATE DEFINER=`zorigt`@`localhost` FUNCTION `PrevMonth`(
+	in_date date
+,	in_mn_count int
+	) RETURNS varchar(7) CHARSET utf8
+begin
+	
+	declare v_date date;
+	declare v_mn_count int;
+	
+	set v_date = coalesce(in_date, current_date());
+	set v_mn_count = coalesce(in_mn_count, 0);
+	
+	if (in_mn_count < 0) then
+		set v_mn_count = 0;
+	end if;
+		
+	set v_date = date_sub(v_date, interval v_mn_count month);
+	
+	return date_format(v_date, '%Y-%m');
+end
+character_set_client: cp850
+collation_connection: cp850_general_ci
+  Database Collation: utf8_general_ci
+1 row in set (0.00 sec)
+
+Bye

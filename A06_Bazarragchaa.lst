@@ -1,0 +1,305 @@
+--------------
+-- Zorigt Bazarragchaa
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+ /* enable warnings! */
+
+use a_vets
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+/* TASK 00 */
+select user(), current_date(), version(), @@sql_mode
+--------------
+
+*************************** 1. row ***************************
+        user(): zorigt@localhost
+current_date(): 2013-06-30
+     version(): 5.6.12
+    @@sql_mode: STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+1 row in set (0.00 sec)
+
+--------------
+/* TASK 01 */
+select
+	vt_clients.cl_id
+,	vt_clients.cl_name_last
+from a_vets.vt_clients
+left join a_vets.vt_animals on vt_animals.cl_id = vt_clients.cl_id
+where vt_animals.an_id is null
+--------------
+
++--------+--------------+
+| cl_id  | cl_name_last |
++--------+--------------+
+|   3423 | Hawkins      |
+|   5686 | Biederbecke  |
+|   5689 | Biederbecke  |
+|   5698 | Biederbecke  |
+|   7212 | Davis        |
+|  25479 | Boston       |
+| 408763 | Turrentine   |
++--------+--------------+
+7 rows in set (0.00 sec)
+
+--------------
+/* TASK 02 */
+select
+	vt_clients.cl_id
+,	vt_clients.cl_name_last
+from a_vets.vt_clients
+where vt_clients.cl_id not in (
+	select
+		vt_animals.cl_id
+	from a_vets.vt_animals
+)
+--------------
+
++--------+--------------+
+| cl_id  | cl_name_last |
++--------+--------------+
+|   3423 | Hawkins      |
+|   5686 | Biederbecke  |
+|   5689 | Biederbecke  |
+|   5698 | Biederbecke  |
+|   7212 | Davis        |
+|  25479 | Boston       |
+| 408763 | Turrentine   |
++--------+--------------+
+7 rows in set (0.00 sec)
+
+--------------
+/* TASK 03 */
+select distinct
+	vt_clients.cl_id
+,	vt_clients.cl_name_last
+from a_vets.vt_clients
+left join a_vets.vt_animals on vt_animals.cl_id = vt_clients.cl_id
+where vt_animals.an_id is not null
+--------------
+
++-------+--------------+
+| cl_id | cl_name_last |
++-------+--------------+
+|   411 | Carter       |
+|  1825 | Harris       |
+|  1852 | Dalrymple    |
+|  3560 | Monk         |
+|  4534 | Montgomery   |
+|  5699 | Biederbecke  |
+|  6897 | Drake        |
+|  7152 | Brubeck      |
++-------+--------------+
+8 rows in set (0.00 sec)
+
+--------------
+/* TASK 04 */
+select distinct
+	vt_clients.cl_id
+,	vt_clients.cl_name_last
+from a_vets.vt_clients
+where vt_clients.cl_id in (
+	select
+		vt_animals.cl_id
+	from a_vets.vt_animals
+)
+--------------
+
++-------+--------------+
+| cl_id | cl_name_last |
++-------+--------------+
+|   411 | Carter       |
+|  1825 | Harris       |
+|  1852 | Dalrymple    |
+|  3560 | Monk         |
+|  4534 | Montgomery   |
+|  5699 | Biederbecke  |
+|  6897 | Drake        |
+|  7152 | Brubeck      |
++-------+--------------+
+8 rows in set (0.00 sec)
+
+--------------
+/* TASK 05 */
+select
+	vt_clients.cl_id
+,	vt_clients.cl_name_last
+,	vt_animals.an_name
+,	vt_animals.an_type
+from a_vets.vt_clients
+left join a_vets.vt_animals on vt_animals.cl_id = vt_clients.cl_id
+order by vt_clients.cl_id, vt_animals.an_type
+--------------
+
++--------+--------------+-----------------+-----------+
+| cl_id  | cl_name_last | an_name         | an_type   |
++--------+--------------+-----------------+-----------+
+|    411 | Carter       | Burgess         | dog       |
+|    411 | Carter       | Calvin Coolidge | dog       |
+|    411 | Carter       | Pinkie          | dog       |
+|    411 | Carter       | Yoggie          | hedgehog  |
+|    411 | Carter       | Pinkie          | lizard    |
+|   1825 | Harris       | Ursula          | cat       |
+|   1825 | Harris       | Koshka          | dormouse  |
+|   1825 | Harris       | Koshka          | hamster   |
+|   1825 | Harris       | Edger           | hedgehog  |
+|   1825 | Harris       | Fritz           | porcupine |
+|   1852 | Dalrymple    | Waldrom         | cat       |
+|   1852 | Dalrymple    | Manfried        | cat       |
+|   1852 | Dalrymple    | Etta            | cat       |
+|   1852 | Dalrymple    | Baldric         | cat       |
+|   1852 | Dalrymple    | Adalwine        | cat       |
+|   1852 | Dalrymple    | NULL            | snake     |
+|   3423 | Hawkins      | NULL            | NULL      |
+|   3560 | Monk         | Mr Peanut       | bird      |
+|   3560 | Monk         | Gutsy           | cat       |
+|   3560 | Monk         | Gutsy           | porcupine |
+|   4534 | Montgomery   | NULL            | bird      |
+|   4534 | Montgomery   | NULL            | bird      |
+|   4534 | Montgomery   | Kenny           | snake     |
+|   5686 | Biederbecke  | NULL            | NULL      |
+|   5689 | Biederbecke  | NULL            | NULL      |
+|   5698 | Biederbecke  | NULL            | NULL      |
+|   5699 | Biederbecke  | George          | chelonian |
+|   5699 | Biederbecke  | Big Mike        | chelonian |
+|   5699 | Biederbecke  | 25              | lizard    |
+|   5699 | Biederbecke  | Gutsy           | snake     |
+|   6897 | Drake        | Napper          | cat       |
+|   7152 | Brubeck      | 3P#_25          | lizard    |
+|   7152 | Brubeck      | 3P#_26          | lizard    |
+|   7212 | Davis        | NULL            | NULL      |
+|  25479 | Boston       | NULL            | NULL      |
+| 408763 | Turrentine   | NULL            | NULL      |
++--------+--------------+-----------------+-----------+
+36 rows in set (0.00 sec)
+
+--------------
+/* TASK 06 */
+select distinct
+	vt_clients.cl_id
+,	vt_clients.cl_name_last
+from a_vets.vt_clients
+left join a_vets.vt_animals on vt_animals.cl_id = vt_clients.cl_id
+where vt_animals.an_type in ('snake', 'chelonian', 'crocodilian', 'lizard')
+--------------
+
++-------+--------------+
+| cl_id | cl_name_last |
++-------+--------------+
+|  4534 | Montgomery   |
+|  5699 | Biederbecke  |
+|   411 | Carter       |
+|  7152 | Brubeck      |
+|  1852 | Dalrymple    |
++-------+--------------+
+5 rows in set (0.00 sec)
+
+--------------
+/* TASK 07 */
+select distinct
+	vt_clients.cl_id
+,	vt_clients.cl_name_last
+from a_vets.vt_clients
+left join a_vets.vt_animals on vt_animals.cl_id = vt_clients.cl_id
+where vt_clients.cl_id not in (
+	select
+		vt_animals.cl_id
+	from a_vets.vt_animals
+	where vt_animals.an_type in ('snake', 'chelonian', 'crocodilian', 'lizard')
+)
+and vt_animals.an_id is not null
+--------------
+
++-------+--------------+
+| cl_id | cl_name_last |
++-------+--------------+
+|  1825 | Harris       |
+|  3560 | Monk         |
+|  6897 | Drake        |
++-------+--------------+
+3 rows in set (0.00 sec)
+
+--------------
+/* TASK 08 */
+select distinct
+	vt_clients.cl_id
+,	vt_clients.cl_name_last
+from a_vets.vt_clients
+left join a_vets.vt_animals on vt_animals.cl_id = vt_clients.cl_id
+where vt_animals.an_type not in ('snake', 'chelonian', 'crocodilian', 'lizard')
+--------------
+
++-------+--------------+
+| cl_id | cl_name_last |
++-------+--------------+
+|   411 | Carter       |
+|  1825 | Harris       |
+|  1852 | Dalrymple    |
+|  3560 | Monk         |
+|  4534 | Montgomery   |
+|  6897 | Drake        |
++-------+--------------+
+6 rows in set (0.00 sec)
+
+--------------
+/* TASK 09 */
+set @v_cl_id = 1825
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+select
+	vt_animals.an_id
+,	vt_animals.an_type
+,	year(vt_exam_headers.ex_date) as 'ExamYear'
+from (
+	select *
+	from vt_clients
+	where vt_clients.cl_city in (
+		select
+			vt_clients.cl_city
+		from vt_clients
+		where vt_clients.cl_id = @v_cl_id
+		)
+	and vt_clients.cl_state in (
+		select
+			vt_clients.cl_state
+		from vt_clients
+		where vt_clients.cl_id = @v_cl_id
+		)
+	) tbl
+left join a_vets.vt_animals using (cl_id)
+left join a_vets.vt_exam_headers using (an_id)
+--------------
+
++-------+-----------+----------+
+| an_id | an_type   | ExamYear |
++-------+-----------+----------+
+| 15165 | dog       |     NULL |
+| 15401 | lizard    |     2013 |
+| 19845 | dog       |     2013 |
+| 21001 | hedgehog  |     2013 |
+| 21003 | dog       |     2013 |
+| 16002 | porcupine |     2012 |
+| 16002 | porcupine |     2012 |
+| 16002 | porcupine |     2012 |
+| 16002 | porcupine |     2013 |
+| 16002 | porcupine |     2013 |
+| 16002 | porcupine |     2013 |
+| 16003 | cat       |     2013 |
+| 16003 | cat       |     2013 |
+| 16003 | cat       |     2013 |
+| 16003 | cat       |     2013 |
+| 21002 | hedgehog  |     NULL |
+| 21005 | dormouse  |     2013 |
+| 21006 | hamster   |     NULL |
++-------+-----------+----------+
+18 rows in set (0.00 sec)
+
+Bye

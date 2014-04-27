@@ -1,0 +1,220 @@
+--------------
+-- Zorigt Bazarragchaa
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+ /* enable warnings! */
+
+use a_vets
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+/* TASK 00 */
+select user(), current_date(), version(), @@sql_mode
+--------------
+
+*************************** 1. row ***************************
+        user(): zorigt@localhost
+current_date(): 2013-06-20
+     version(): 5.6.12
+    @@sql_mode: STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+1 row in set (0.00 sec)
+
+--------------
+/* TASK 01 */
+select
+	cl_name_first
+,	cl_name_last
+from vt_clients
+where cl_state in ('CA')
+--------------
+
++---------------+--------------+
+| cl_name_first | cl_name_last |
++---------------+--------------+
+| NULL          | Biederbecke  |
+| Sam           | Biederbecke  |
+| Stanley       | Turrentine   |
++---------------+--------------+
+3 rows in set (0.00 sec)
+
+--------------
+/* TASK 02 */
+select
+	cl_name_first
+,	cl_name_last
+,	cl_phone
+from vt_clients
+where cl_phone is not null
+order by cl_id
+--------------
+
++---------------+--------------+--------------+
+| cl_name_first | cl_name_last | cl_phone     |
++---------------+--------------+--------------+
+| James         | Carter       | 510.258.4546 |
+| Jack          | Dalrymple    | 701.328.2725 |
+| Coleman       | Hawkins      | 937.258.5645 |
+| Theo          | Monk         | 212.582.6245 |
+| NULL          | Biederbecke  | 217.239.6945 |
+| NULL          | Biederbecke  | 415.239.6945 |
+| Sue           | Biederbecke  | 217.239.6875 |
+| Sam           | Biederbecke  | 415.239.6875 |
+| Dave          | Brubeck      | 258.257.2727 |
+| Stanley       | Turrentine   | 619.231.1515 |
++---------------+--------------+--------------+
+10 rows in set (0.00 sec)
+
+--------------
+/* TASK 03 */
+select
+	stf_name_last
+,	stf_name_first
+,	stf_id
+from vt_staff
+where stf_job_title in ('vet', 'vet assnt')
+--------------
+
++---------------+----------------+--------+
+| stf_name_last | stf_name_first | stf_id |
++---------------+----------------+--------+
+| Dolittle      | Eliza          |     15 |
+| Wilkommen     | Bridgette      |     25 |
+| Helfen        | Sandy          |     29 |
+| Wasilewski    | Marcin         |     30 |
+| Webster       | Brenda         |     37 |
+| Wabich        | Rhoda          |     38 |
+| Gordon        | Dexter         |     52 |
+| Helfen        | Sandy          |     55 |
++---------------+----------------+--------+
+8 rows in set (0.00 sec)
+
+--------------
+/* TASK 04 */
+select
+	cl_id
+,	an_id
+,	an_name
+from vt_animals
+where an_type in ('hamster', 'capybara', 'porcupine', 'dormouse') 
+order by cl_id, an_id
+--------------
+
++-------+-------+---------+
+| cl_id | an_id | an_name |
++-------+-------+---------+
+|  1825 | 16002 | Fritz   |
+|  1825 | 21005 | Koshka  |
+|  1825 | 21006 | Koshka  |
+|  3560 | 12038 | Gutsy   |
++-------+-------+---------+
+4 rows in set (0.00 sec)
+
+--------------
+/* TASK 05 */
+select distinct
+	cl_id
+,	an_type
+from vt_animals
+where an_type in ('snake', 'chelonian', 'crocodilian', 'lizard')
+order by cl_id
+--------------
+
++-------+-----------+
+| cl_id | an_type   |
++-------+-----------+
+|   411 | lizard    |
+|  1852 | snake     |
+|  4534 | snake     |
+|  5699 | chelonian |
+|  5699 | lizard    |
+|  5699 | snake     |
+|  7152 | lizard    |
++-------+-----------+
+7 rows in set (0.00 sec)
+
+--------------
+/* TASK 06 */
+select
+	cl_id
+,	an_id
+,	an_name
+,	an_dob
+,	an_type
+from vt_animals
+where an_type not in ('hamster', 'capybara', 'porcupine', 'dormouse', 'snake', 'chelonian', 'crocodilian', 'lizard')
+order by an_dob desc
+--------------
+
++-------+-------+-----------------+------------+----------+
+| cl_id | an_id | an_name         | an_dob     | an_type  |
++-------+-------+-----------------+------------+----------+
+|  1852 | 21318 | Waldrom         | 2012-06-11 | cat      |
+|  1852 | 21315 | Baldric         | 2012-06-11 | cat      |
+|  4534 | 11025 | NULL            | 2012-02-01 | bird     |
+|  1852 | 21317 | Manfried        | 2011-06-11 | cat      |
+|  1852 | 21314 | Adalwine        | 2011-06-11 | cat      |
+|  1852 | 21316 | Etta            | 2010-06-11 | cat      |
+|  3560 | 10002 | Gutsy           | 2010-04-15 | cat      |
+|   411 | 21001 | Yoggie          | 2009-05-22 | hedgehog |
+|   411 | 19845 | Pinkie          | 2009-02-02 | dog      |
+|  6897 | 16004 | Napper          | 2006-06-06 | cat      |
+|  1825 | 16003 | Ursula          | 2006-06-06 | cat      |
+|   411 | 15165 | Burgess         | 2005-11-20 | dog      |
+|  4534 | 11029 | NULL            | 2005-10-01 | bird     |
+|   411 | 21003 | Calvin Coolidge | 2004-06-18 | dog      |
+|  1825 | 21002 | Edger           | 2002-10-02 | hedgehog |
+|  3560 | 12035 | Mr Peanut       | 1995-02-28 | bird     |
++-------+-------+-----------------+------------+----------+
+16 rows in set (0.00 sec)
+
+--------------
+/* TASK 07 */
+select
+	ex_id
+,	srv_id
+,	ex_fee
+from vt_exam_details
+where ex_fee between 35 and 50
+order by srv_id
+--------------
+
++-------+--------+--------+
+| ex_id | srv_id | ex_fee |
++-------+--------+--------+
+|  3390 |    101 |  50.00 |
+|  3282 |    110 |  50.00 |
+|  3612 |    606 |  40.00 |
+|  3104 |    613 |  47.00 |
+|  3612 |    613 |  47.00 |
+|  1998 |    687 |  45.00 |
+|  3288 |    687 |  45.00 |
+|  3306 |    687 |  45.00 |
+|  3392 |   1003 |  45.00 |
++-------+--------+--------+
+9 rows in set (0.00 sec)
+
+--------------
+/* TASK 08 */
+select
+	an_id
+,	an_name
+from vt_animals
+where an_dob between '2000-01-01' and '2005-12-31 23:59:59'
+--------------
+
++-------+-----------------+
+| an_id | an_name         |
++-------+-----------------+
+| 11029 | NULL            |
+| 15165 | Burgess         |
+| 21002 | Edger           |
+| 21003 | Calvin Coolidge |
++-------+-----------------+
+4 rows in set (0.00 sec)
+
+Bye

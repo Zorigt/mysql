@@ -1,0 +1,340 @@
+--------------
+-- Zorigt Bazarragchaa
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+ /* enable warnings! */
+
+use a_vets
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+/* TASK 00 */
+select user(), current_date(), version(), @@sql_mode
+--------------
+
+*************************** 1. row ***************************
+        user(): zorigt@localhost
+current_date(): 2013-06-27
+     version(): 5.6.12
+    @@sql_mode: STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+1 row in set (0.00 sec)
+
+--------------
+/* TASK 01 */
+set @v_fee = 50
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+select 
+	vt_exam_details.srv_id
+,	vt_exam_details.ex_fee
+,	vt_exam_details.ex_id
+,	vt_exam_headers.ex_date
+from a_vets.vt_exam_details
+join a_vets.vt_exam_headers using (ex_id)
+where vt_exam_details.ex_fee > @v_fee
+--------------
+
++--------+--------+-------+---------------------+
+| srv_id | ex_fee | ex_id | ex_date             |
++--------+--------+-------+---------------------+
+|    104 |  60.00 |  3101 | 2013-01-02 13:00:00 |
+|    615 |  75.00 |  3101 | 2013-01-02 13:00:00 |
+|    104 |  60.00 |  3102 | 2013-01-02 13:00:00 |
+|   4601 | 275.00 |  3103 | 2013-01-02 15:30:00 |
+|    106 |  75.00 |  3104 | 2013-01-02 16:30:00 |
+|    523 |  60.00 |  3282 | 2013-02-23 10:30:00 |
+|    105 |  55.00 |  3390 | 2013-03-22 09:00:00 |
+|    108 |  80.00 |  3420 | 2013-04-01 16:30:00 |
+|   4601 | 275.00 |  3486 | 2013-03-31 13:00:00 |
+|    110 |  75.00 |  3513 | 2013-06-06 10:30:00 |
+|    602 | 222.00 |  3612 | 2013-05-23 08:30:00 |
+|    603 |  78.00 |  3612 | 2013-05-23 08:30:00 |
+|    604 | 109.00 |  3612 | 2013-05-23 08:30:00 |
+|    625 | 155.00 |  3612 | 2013-05-23 08:30:00 |
+|    607 |  57.00 |  3612 | 2013-05-23 08:30:00 |
+|    615 |  78.30 |  3612 | 2013-05-23 08:30:00 |
++--------+--------+-------+---------------------+
+16 rows in set (0.00 sec)
+
+--------------
+set @v_fee = 100
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+select 
+	vt_exam_details.srv_id
+,	vt_exam_details.ex_fee
+,	vt_exam_details.ex_id
+,	vt_exam_headers.ex_date
+from a_vets.vt_exam_details
+join a_vets.vt_exam_headers using (ex_id)
+where vt_exam_details.ex_fee > @v_fee
+--------------
+
++--------+--------+-------+---------------------+
+| srv_id | ex_fee | ex_id | ex_date             |
++--------+--------+-------+---------------------+
+|   4601 | 275.00 |  3103 | 2013-01-02 15:30:00 |
+|   4601 | 275.00 |  3486 | 2013-03-31 13:00:00 |
+|    602 | 222.00 |  3612 | 2013-05-23 08:30:00 |
+|    604 | 109.00 |  3612 | 2013-05-23 08:30:00 |
+|    625 | 155.00 |  3612 | 2013-05-23 08:30:00 |
++--------+--------+-------+---------------------+
+5 rows in set (0.00 sec)
+
+--------------
+/* TASK 02 */
+set @v_job = 'vet'
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+select
+	vt_staff.stf_id
+,	vt_staff.stf_name_first as 'First'
+,	vt_staff.stf_name_last as 'Last'
+,	vt_exam_headers.ex_id
+,	vt_exam_headers.ex_date
+from a_vets.vt_staff
+join vt_exam_headers using (stf_id)
+where vt_staff.stf_job_title != @v_job
+--------------
+
++--------+-------+--------+-------+---------------------+
+| stf_id | First | Last   | ex_id | ex_date             |
++--------+-------+--------+-------+---------------------+
+|     29 | Sandy | Helfen |  1996 | 2012-11-16 09:15:00 |
+|     29 | Sandy | Helfen |  1997 | 2012-11-06 10:45:00 |
+|     29 | Sandy | Helfen |  1998 | 2012-11-07 10:45:00 |
+|     29 | Sandy | Helfen |  1999 | 2012-12-03 14:30:00 |
+|     29 | Sandy | Helfen |  2007 | 2013-03-21 10:45:00 |
+|     29 | Sandy | Helfen |  3001 | 2012-12-24 10:45:00 |
+|     29 | Sandy | Helfen |  3010 | 2012-12-22 10:45:00 |
+|     29 | Sandy | Helfen |  3202 | 2013-02-03 14:30:00 |
+|     29 | Sandy | Helfen |  3203 | 2013-02-03 14:30:00 |
+|     29 | Sandy | Helfen |  3306 | 2013-03-06 10:45:00 |
+|     29 | Sandy | Helfen |  3393 | 2013-03-23 12:15:00 |
+|     29 | Sandy | Helfen |  3409 | 2013-03-27 10:45:00 |
+|     29 | Sandy | Helfen |  3411 | 2013-04-29 14:30:00 |
+|     29 | Sandy | Helfen |  3412 | 2013-04-30 14:30:00 |
+|     29 | Sandy | Helfen |  3514 | 2013-06-10 10:45:00 |
++--------+-------+--------+-------+---------------------+
+15 rows in set (0.00 sec)
+
+--------------
+/* TASK 03 */
+set @an_id = 15001
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+select 
+	vt_clients.cl_id
+,	vt_clients.cl_name_last
+,	vt_animals.an_type
+,	vt_exam_details.srv_id
+,	vt_exam_details.ex_desc
+,	vt_exam_details.ex_fee
+from a_vets.vt_clients
+join a_vets.vt_animals using (cl_id)
+join a_vets.vt_exam_headers using (an_id)
+join a_vets.vt_exam_details using (ex_id)
+where vt_animals.an_id = @an_id
+--------------
+
++-------+--------------+-----------+--------+--------------------+--------+
+| cl_id | cl_name_last | an_type   | srv_id | ex_desc            | ex_fee |
++-------+--------------+-----------+--------+--------------------+--------+
+|  5699 | Biederbecke  | chelonian |    104 | reg exam           |  60.00 |
+|  5699 | Biederbecke  | chelonian |    615 | poss infection     |  75.00 |
+|  5699 | Biederbecke  | chelonian |    104 | check up           |  30.00 |
+|  5699 | Biederbecke  | chelonian |   1002 | NULL               |  25.00 |
+|  5699 | Biederbecke  | chelonian |    687 | shell softening    |  45.00 |
+|  5699 | Biederbecke  | chelonian |    104 | follow up check up |  30.00 |
++-------+--------------+-----------+--------+--------------------+--------+
+6 rows in set (0.00 sec)
+
+--------------
+set @an_id = 16004
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+select 
+	vt_clients.cl_id
+,	vt_clients.cl_name_last
+,	vt_animals.an_type
+,	vt_exam_details.srv_id
+,	vt_exam_details.ex_desc
+,	vt_exam_details.ex_fee
+from a_vets.vt_clients
+join a_vets.vt_animals using (cl_id)
+join a_vets.vt_exam_headers using (an_id)
+join a_vets.vt_exam_details using (ex_id)
+where vt_animals.an_id = @an_id
+--------------
+
+Empty set (0.00 sec)
+
+--------------
+set @an_id = 21007
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+select 
+	vt_clients.cl_id
+,	vt_clients.cl_name_last
+,	vt_animals.an_type
+,	vt_exam_details.srv_id
+,	vt_exam_details.ex_desc
+,	vt_exam_details.ex_fee
+from a_vets.vt_clients
+join a_vets.vt_animals using (cl_id)
+join a_vets.vt_exam_headers using (an_id)
+join a_vets.vt_exam_details using (ex_id)
+where vt_animals.an_id = @an_id
+--------------
+
+Empty set (0.00 sec)
+
+--------------
+/* TASK 04 */
+select
+	vt_clients.cl_id
+,	vt_clients.cl_name_last as 'Last Name'
+from a_vets.vt_clients
+where vt_clients.cl_id in (
+	select cl_id
+	from a_vets.vt_animals
+	where vt_animals.an_type in ('bird')
+)
+--------------
+
++-------+------------+
+| cl_id | Last Name  |
++-------+------------+
+|  4534 | Montgomery |
+|  3560 | Monk       |
++-------+------------+
+2 rows in set (0.00 sec)
+
+--------------
+/* TASK 05 */
+select
+	vt_clients.cl_id
+,	vt_clients.cl_name_last as 'Last Name'
+from a_vets.vt_clients
+where vt_clients.cl_id in (
+	select cl_id
+	from a_vets.vt_animals
+	where vt_animals.an_type in ('bird')
+)
+and vt_clients.cl_id in (
+	select cl_id
+	from a_vets.vt_animals
+	where vt_animals.an_type in ('snake', 'chelonian', 'crocodilian', 'lizard')
+)
+--------------
+
++-------+------------+
+| cl_id | Last Name  |
++-------+------------+
+|  4534 | Montgomery |
++-------+------------+
+1 row in set (0.00 sec)
+
+--------------
+/* TASK 06 */
+select
+	vt_clients.cl_id
+,	vt_clients.cl_name_last as 'Last Name'
+from a_vets.vt_clients
+where vt_clients.cl_id in (
+	select cl_id
+	from a_vets.vt_animals
+	where vt_animals.an_type in ('bird')
+)
+and not vt_clients.cl_id in (
+	select cl_id
+	from a_vets.vt_animals
+	where vt_animals.an_type in ('snake', 'chelonian', 'crocodilian', 'lizard')
+)
+--------------
+
++-------+-----------+
+| cl_id | Last Name |
++-------+-----------+
+|  3560 | Monk      |
++-------+-----------+
+1 row in set (0.00 sec)
+
+--------------
+/* TASK 07 */
+set @v_current_year = year(current_date())
+--------------
+
+Query OK, 0 rows affected (0.00 sec)
+
+--------------
+select
+	vt_animals.an_id
+,	vt_animals.an_name
+,	vt_animals.an_type
+from a_vets.vt_animals
+join a_vets.vt_exam_headers using (an_id)
+where year(ex_date) in (@v_current_year, @v_current_year - 1)
+--------------
+
++-------+-----------------+-----------+
+| an_id | an_name         | an_type   |
++-------+-----------------+-----------+
+| 12035 | Mr Peanut       | bird      |
+| 15001 | Big Mike        | chelonian |
+| 15001 | Big Mike        | chelonian |
+| 15001 | Big Mike        | chelonian |
+| 15002 | George          | chelonian |
+| 15002 | George          | chelonian |
+| 15401 | Pinkie          | lizard    |
+| 16002 | Fritz           | porcupine |
+| 16002 | Fritz           | porcupine |
+| 16002 | Fritz           | porcupine |
+| 16002 | Fritz           | porcupine |
+| 16002 | Fritz           | porcupine |
+| 16002 | Fritz           | porcupine |
+| 16003 | Ursula          | cat       |
+| 16003 | Ursula          | cat       |
+| 16003 | Ursula          | cat       |
+| 16003 | Ursula          | cat       |
+| 17025 | 25              | lizard    |
+| 17025 | 25              | lizard    |
+| 17025 | 25              | lizard    |
+| 17025 | 25              | lizard    |
+| 17025 | 25              | lizard    |
+| 17026 | 3P#_26          | lizard    |
+| 17026 | 3P#_26          | lizard    |
+| 17027 | 3P#_25          | lizard    |
+| 17027 | 3P#_25          | lizard    |
+| 17027 | 3P#_25          | lizard    |
+| 19845 | Pinkie          | dog       |
+| 21001 | Yoggie          | hedgehog  |
+| 21003 | Calvin Coolidge | dog       |
+| 21005 | Koshka          | dormouse  |
++-------+-----------------+-----------+
+31 rows in set (0.00 sec)
+
+Bye
